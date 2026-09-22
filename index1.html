@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Mandi Queue Management System</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h2>Smart Mandi Gate-Pass System</h2>
+    <span id="networkStatus" class="status-badge">Online</span>
+  </header>
+
+  <nav>
+    <button class="nav-btn active" onclick="switchTab('farmerTab', event)">Farmer Portal</button>
+    <button class="nav-btn" onclick="switchTab('officerTab', event)">Mandi Officer</button>
+    <button class="nav-btn" onclick="switchTab('machineTab', event)">Weighbridge / Machine</button>
+    <button class="nav-btn" onclick="switchTab('summaryTab', event)">Daily Summary</button>
+  </nav>
+
+  <div class="container">
+
+    <!-- 1. FARMER SECTION -->
+    <div id="farmerTab" class="section active">
+      <h3>Farmer Registration & Slot Booking</h3>
+      <div id="registrationBlocked" class="alert" style="display:none; background:#ffebee; border-color:#f44336; color:#c62828;">
+        <strong>Notice:</strong> Target daily procurement quantity reached for today. Registration is closed.
+      </div>
+
+      <form id="farmerForm">
+        <div class="form-group">
+          <label for="mandiName">Select Mandi Location:</label>
+          <select id="mandiName" required>
+            <option value="Amravati Main APMC Mandi">Amravati Main APMC Mandi</option>
+            <option value="Nagpur Cotton Market APMC">Nagpur Cotton Market APMC</option>
+            <option value="Lasalgaon Onion APMC Mandi">Lasalgaon Onion APMC Mandi</option>
+            <option value="Azadpur Wholesale Mandi">Azadpur Wholesale Mandi</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="farmerName">Farmer Name:</label>
+          <input type="text" id="farmerName" placeholder="Enter Full Name" required>
+        </div>
+
+        <div class="form-group">
+          <label for="mobileNo">Mobile Number:</label>
+          <div class="otp-box">
+            <input type="tel" id="mobileNo" placeholder="10-digit number" required pattern="[0-9]{10}">
+            <button type="button" onclick="sendDemoOTP()">Get Demo OTP</button>
+          </div>
+        </div>
+
+        <div id="otpSection" style="display:none;" class="card">
+          <p>Demo OTP: <strong id="demoOtpDisplay" style="color:var(--accent);"></strong> (Expires in <span id="timer">20</span>s)</p>
+          <input type="text" id="enteredOtp" placeholder="Enter 4-digit OTP">
+          <button type="button" class="btn-main" onclick="verifyOTP()">Verify OTP</button>
+        </div>
+
+        <div class="form-group">
+          <label for="cropQty">Crop Quantity (in Quintals):</label>
+          <input type="number" id="cropQty" min="1" placeholder="e.g. 50" required>
+        </div>
+
+        <div class="form-group">
+          <label for="timeSlot">Preferred Time Slot:</label>
+          <select id="timeSlot" required>
+            <option value="08:00 AM - 10:00 AM">08:00 AM - 10:00 AM</option>
+            <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
+            <option value="01:00 PM - 03:00 PM">01:00 PM - 03:00 PM</option>
+            <option value="03:00 PM - 05:00 PM">03:00 PM - 05:00 PM</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="languagePref">Preferred Language (Bhashini Multi-lingual):</label>
+          <select id="languagePref">
+            <option value="hi-IN">Hindi (हिंदी)</option>
+            <option value="mr-IN">Marathi (मराठी)</option>
+            <option value="en-US">English</option>
+          </select>
+        </div>
+
+        <button type="submit" id="bookBtn" class="btn-main" disabled>Book Gate-Pass Slot</button>
+      </form>
+
+      <div id="ticketResult" class="card" style="display:none; margin-top:20px;">
+        <h4 style="color:var(--primary); margin-top:0;">Slot Confirmed! (Gate Pass Issued)</h4>
+        <p><strong>Mandi:</strong> <span id="lblMandi"></span></p>
+        <p><strong>Token ID:</strong> <span id="lblToken"></span></p>
+        <p><strong>Strict Entry Window:</strong> <span id="lblSlot"></span></p>
+        <div class="alert">
+          <strong>Bhashini Message Alert:</strong>
+          <p id="bhashiniTextMsg"></p>
+          <button type="button" onclick="playVoiceMessage()">🔊 Play Audio Message</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. OFFICER SECTION -->
+    <div id="officerTab" class="section">
+      <h3>Mandi Officer Dashboard</h3>
+      <div class="card">
+        <label for="maxTarget">Set Daily Maximum Capacity Target (Quintals):</label>
+        <input type="number" id="maxTarget" value="500">
+        <button class="btn-main" onclick="updateTarget()" style="margin-top:5px;">Update Limit</button>
+      </div>
+
+      <h4>Send Instant SMS Alerts to Farmers</h4>
+      <div class="card">
+        <label for="smsFarmerList">Select Target Farmer Token:</label>
+        <select id="smsFarmerList"></select>
+        <label for="customSms" style="margin-top:10px;">Custom Alert Message:</label>
+        <input type="text" id="customSms" placeholder="e.g. Bring valid Kisan ID card at gate">
+        <button class="btn-main" onclick="sendSmsAlert()">Send Broadcast SMS</button>
+      </div>
+    </div>
+
+    <!-- 3. MACHINE SLOWDOWN SECTION -->
+    <div id="machineTab" class="section">
+      <h3>Weighbridge & Machine Operations</h3>
+      <div class="alert">
+        <strong>Dynamic Queue Controller:</strong> Throttle incoming slots if weighbridges experience mechanical failure or slowdown.
+      </div>
+      <div class="card">
+        <label for="machineStatus">Weighbridge Machine Status:</label>
+        <select id="machineStatus" onchange="toggleMachineStatus()">
+          <option value="NORMAL">Normal Speed (100% Intake)</option>
+          <option value="SLOW">Slowdown / Technical Delay (50% Intake)</option>
+          <option value="HALT">Machine Breakdown (Stop Registrations)</option>
+        </select>
+      </div>
+      <p>Current System Adjustment: <strong id="speedStatus">Normal Operations</strong></p>
+    </div>
+
+    <!-- 4. DAILY SUMMARY SECTION -->
+    <div id="summaryTab" class="section">
+      <h3>Daily Procurement Summary</h3>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h4>Total Collected</h4>
+          <h3 id="sumQty">0 Qtl</h3>
+        </div>
+        <div class="summary-card">
+          <h4>Max Capacity Limit</h4>
+          <h3 id="sumLimit">500 Qtl</h3>
+        </div>
+        <div class="summary-card">
+          <h4>Government MSP Rate</h4>
+          <h3>₹2,275 / Qtl</h3>
+        </div>
+        <div class="summary-card">
+          <h4>Total Trade Value</h4>
+          <h3 id="sumValue">₹0</h3>
+        </div>
+      </div>
+
+      <h4>Registered Farmers Log</h4>
+      <div id="farmersListLog"></div>
+    </div>
+
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
