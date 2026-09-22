@@ -119,6 +119,19 @@ button.btn-main:disabled {
   margin-bottom: 15px; 
 }
 
+.ticket-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .ticket-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 .alert { 
   padding: 10px; 
   background: #fff3e0; 
