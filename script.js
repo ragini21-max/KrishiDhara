@@ -71,35 +71,35 @@ const translations = {
 // Event Listeners Initialization
 document.addEventListener('DOMContentLoaded', () => {
     // Navigation Tabs
-    document.getElementById('tab-farmer').addEventListener('click', () => switchTab('farmer'));
-    document.getElementById('tab-officer').addEventListener('click', () => switchTab('officer'));
-    document.getElementById('tab-summary').addEventListener('click', () => switchTab('summary'));
+    document.getElementById('tab-farmer')?.addEventListener('click', () => switchTab('farmer'));
+    document.getElementById('tab-officer')?.addEventListener('click', () => switchTab('officer'));
+    document.getElementById('tab-summary')?.addEventListener('click', () => switchTab('summary'));
 
     // Language Change
-    document.getElementById('langSelect').addEventListener('change', (e) => changeLanguage(e.target.value));
+    document.getElementById('langSelect')?.addEventListener('change', (e) => changeLanguage(e.target.value));
 
     // OTP Functionality
-    document.getElementById('btn-gen-otp').addEventListener('click', generateOTP);
-    document.getElementById('btn-verify-otp').addEventListener('click', verifyOTP);
+    document.getElementById('btn-gen-otp')?.addEventListener('click', generateOTP);
+    document.getElementById('btn-verify-otp')?.addEventListener('click', verifyOTP);
 
     // Mandi Capacity Tracker
-    document.getElementById('mandiSelect').addEventListener('change', updateMandiCapacityUI);
+    document.getElementById('mandiSelect')?.addEventListener('change', updateMandiCapacityUI);
 
     // Form Booking
-    document.getElementById('bookingForm').addEventListener('submit', handleBooking);
+    document.getElementById('bookingForm')?.addEventListener('submit', handleBooking);
 
     // Audio Playback
-    document.getElementById('btn-replay-audio').addEventListener('click', playAudioAnnouncement);
+    document.getElementById('btn-replay-audio')?.addEventListener('click', playAudioAnnouncement);
 
     // Officer Controls
-    document.getElementById('btn-start-cam').addEventListener('click', startQRScanner);
-    document.getElementById('btn-stop-cam').addEventListener('click', stopQRScanner);
-    document.getElementById('btn-fetch-manual').addEventListener('click', loadManualToken);
-    document.getElementById('btn-complete-pay').addEventListener('click', completeEntryAndPay);
+    document.getElementById('btn-start-cam')?.addEventListener('click', startQRScanner);
+    document.getElementById('btn-stop-cam')?.addEventListener('click', stopQRScanner);
+    document.getElementById('btn-fetch-manual')?.addEventListener('click', loadManualToken);
+    document.getElementById('btn-complete-pay')?.addEventListener('click', completeEntryAndPay);
 
     // Vehicle Speed Adjustment Buttons
-    document.getElementById('btn-speed-slow').addEventListener('click', () => adjustVehicleSpeed('slow'));
-    document.getElementById('btn-speed-normal').addEventListener('click', () => adjustVehicleSpeed('normal'));
+    document.getElementById('btn-speed-slow')?.addEventListener('click', () => adjustVehicleSpeed('slow'));
+    document.getElementById('btn-speed-normal')?.addEventListener('click', () => adjustVehicleSpeed('normal'));
 
     // Register Service Worker for Offline Functionality
     registerServiceWorker();
@@ -108,10 +108,17 @@ document.addEventListener('DOMContentLoaded', () => {
 // Navigation Switcher Logic
 function switchTab(tab) {
     document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('nav button').forEach(el => el.classList.remove('active-tab'));
+    document.querySelectorAll('nav button').forEach(el => {
+        el.classList.remove('font-semibold', 'text-green-800', 'border-b-2', 'border-green-700');
+        el.classList.add('text-slate-600');
+    });
     
-    document.getElementById(`sec-${tab}`).classList.remove('hidden');
-    document.getElementById(`tab-${tab}`).classList.add('active-tab');
+    document.getElementById(`sec-${tab}`)?.classList.remove('hidden');
+    const activeBtn = document.getElementById(`tab-${tab}`);
+    if (activeBtn) {
+        activeBtn.classList.add('font-semibold', 'text-green-800', 'border-b-2', 'border-green-700');
+        activeBtn.classList.remove('text-slate-600');
+    }
 }
 
 // Multilingual Translation Update Logic
@@ -119,19 +126,19 @@ function changeLanguage(langKey) {
     appData.lang = langKey;
     const t = translations[langKey];
 
-    document.getElementById('lbl-otp-title').innerText = t.otpTitle;
-    document.getElementById('lbl-otp-desc').innerText = t.otpDesc;
-    document.getElementById('lbl-booking-title').innerText = t.bookingTitle;
-    document.getElementById('lbl-farmer-name').innerText = t.farmerName;
-    document.getElementById('lbl-mandi-select').innerText = t.mandiSelect;
-    document.getElementById('lbl-quantity').innerText = t.quantity;
-    document.getElementById('lbl-slot-time').innerText = t.slotTime;
-    document.getElementById('btn-submit-booking').innerText = t.submitBooking;
-    document.getElementById('lbl-pos-text').innerText = t.posText;
-    document.getElementById('lbl-eta-text').innerText = t.etaText;
-    document.getElementById('lbl-summary-title').innerText = t.summaryTitle;
-    document.getElementById('lbl-total-goods').innerText = t.totalGoods;
-    document.getElementById('lbl-total-money').innerText = t.totalMoney;
+    if (document.getElementById('lbl-otp-title')) document.getElementById('lbl-otp-title').innerText = t.otpTitle;
+    if (document.getElementById('lbl-otp-desc')) document.getElementById('lbl-otp-desc').innerText = t.otpDesc;
+    if (document.getElementById('lbl-booking-title')) document.getElementById('lbl-booking-title').innerText = t.bookingTitle;
+    if (document.getElementById('lbl-farmer-name')) document.getElementById('lbl-farmer-name').innerText = t.farmerName;
+    if (document.getElementById('lbl-mandi-select')) document.getElementById('lbl-mandi-select').innerText = t.mandiSelect;
+    if (document.getElementById('lbl-quantity')) document.getElementById('lbl-quantity').innerText = t.quantity;
+    if (document.getElementById('lbl-slot-time')) document.getElementById('lbl-slot-time').innerText = t.slotTime;
+    if (document.getElementById('btn-submit-booking')) document.getElementById('btn-submit-booking').innerText = t.submitBooking;
+    if (document.getElementById('lbl-pos-text')) document.getElementById('lbl-pos-text').innerText = t.posText;
+    if (document.getElementById('lbl-eta-text')) document.getElementById('lbl-eta-text').innerText = t.etaText;
+    if (document.getElementById('lbl-summary-title')) document.getElementById('lbl-summary-title').innerText = t.summaryTitle;
+    if (document.getElementById('lbl-total-goods')) document.getElementById('lbl-total-goods').innerText = t.totalGoods;
+    if (document.getElementById('lbl-total-money')) document.getElementById('lbl-total-money').innerText = t.totalMoney;
 
     if (appData.activeToken) {
         playAudioAnnouncement();
@@ -186,11 +193,12 @@ function verifyOTP() {
 function updateMandiCapacityUI() {
     const selectedMandi = document.getElementById('mandiSelect').value;
     const cap = appData.dailyCapacities[selectedMandi];
-    document.getElementById('capacityStatus').innerText = `Booked: ${cap.booked} / ${cap.max} Tons`;
+    const statusElem = document.getElementById('capacityStatus');
+    statusElem.innerText = `Booked: ${cap.booked} / ${cap.max} Tons`;
     if (cap.booked >= cap.max) {
-        document.getElementById('capacityStatus').className = "font-bold text-red-600";
+        statusElem.className = "font-bold text-red-600";
     } else {
-        document.getElementById('capacityStatus').className = "font-bold text-green-700";
+        statusElem.className = "font-bold text-green-700";
     }
 }
 
@@ -243,11 +251,13 @@ function handleBooking(event) {
 
     // QR Code Generation
     document.getElementById('qrcode').innerHTML = "";
-    new QRCode(document.getElementById("qrcode"), {
-        text: JSON.stringify({ id: tokenObj.id, farmer: tokenObj.farmer, mandi: tokenObj.mandi }),
-        width: 128,
-        height: 128
-    });
+    if (typeof QRCode !== 'undefined') {
+        new QRCode(document.getElementById("qrcode"), {
+            text: JSON.stringify({ id: tokenObj.id, farmer: tokenObj.farmer, mandi: tokenObj.mandi }),
+            width: 128,
+            height: 128
+        });
+    }
 
     playAudioAnnouncement();
 }
@@ -292,21 +302,32 @@ function playAudioAnnouncement() {
 
 // Officer QR Scanner & Manual Fetch
 function startQRScanner() {
+    if (typeof Html5QrcodeScanner === 'undefined') {
+        alert("QR Scanner library not loaded.");
+        return;
+    }
+    
+    if (appData.html5QrScanner) {
+        stopQRScanner();
+    }
+
     appData.html5QrScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
     appData.html5QrScanner.render((decodedText) => {
         try {
             const parsed = JSON.parse(decodedText);
             loadTokenData(parsed.id);
-            appData.html5QrScanner.clear();
+            stopQRScanner();
         } catch(e) {
             loadTokenData(decodedText);
+            stopQRScanner();
         }
     }, (error) => {});
 }
 
 function stopQRScanner() {
     if (appData.html5QrScanner) {
-        appData.html5QrScanner.clear();
+        appData.html5QrScanner.clear().catch(err => console.error("Error clearing scanner", err));
+        appData.html5QrScanner = null;
     }
 }
 
@@ -332,6 +353,8 @@ function completeEntryAndPay() {
     const tokenId = document.getElementById('officer-token-id').innerText;
     const token = appData.tokens.find(t => t.id === tokenId);
     
+    if (!token) return;
+
     const actualW = parseFloat(document.getElementById('actualWeight').value);
     const msp = parseFloat(document.getElementById('mspRate').value);
 
@@ -407,7 +430,7 @@ function updateSummaryDashboard() {
 
 // Service Worker Registration for Offline Capability
 function registerServiceWorker() {
-    if ('serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
         const swCode = `
             const CACHE_NAME = 'mandi-cache-v1';
             self.addEventListener('install', e => {
