@@ -1,189 +1,272 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Smart Mandi Queue Management System</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Mandi Queue & Gate-Pass Management System</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- CSS Stylesheet Link -->
+    <link rel="stylesheet" href="styles.css">
+    <!-- External JS Libraries for QR Code Generation & Camera Scanning -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
 </head>
-<body>
+<body class="bg-slate-100 min-h-screen text-slate-800 font-sans">
 
-  <header>
-    <h2>Smart Mandi Gate-Pass System</h2>
-    <span id="networkStatus" class="status-badge">Online</span>
-  </header>
-
-  <nav>
-    <button class="nav-btn active" onclick="switchTab('farmerTab', event)">Farmer Portal</button>
-    <button class="nav-btn" onclick="switchTab('officerTab', event)">Mandi Officer</button>
-    <button class="nav-btn" onclick="switchTab('machineTab', event)">Weighbridge / Machine</button>
-    <button class="nav-btn" onclick="switchTab('summaryTab', event)">Daily Summary</button>
-  </nav>
-
-  <div class="container">
-
-    <!-- 1. FARMER SECTION -->
-    <div id="farmerTab" class="section active">
-      <h3>Farmer Registration & Slot Booking</h3>
-      <div id="registrationBlocked" class="alert" style="display:none; background:#ffebee; border-color:#f44336; color:#c62828;">
-        <strong>Notice:</strong> Target daily procurement capacity reached for today. Registration is closed.
-      </div>
-
-      <form id="farmerForm">
-        <div class="form-group">
-          <label for="mandiName">Select Mandi Location:</label>
-          <select id="mandiName" required>
-            <option value="Amravati Main APMC Mandi">Amravati Main APMC Mandi</option>
-            <option value="Nagpur Cotton Market APMC">Nagpur Cotton Market APMC</option>
-            <option value="Lasalgaon Onion APMC Mandi">Lasalgaon Onion APMC Mandi</option>
-            <option value="Azadpur Wholesale Mandi">Azadpur Wholesale Mandi</option>
-          </select>
+    <!-- Header & Language Selector -->
+    <header class="bg-green-800 text-white p-4 shadow-md flex justify-between items-center sticky top-0 z-50">
+        <div>
+            <h1 class="text-xl font-bold tracking-wide">🌾 Smart Mandi Queue System</h1>
+            <p class="text-xs text-green-200">Ministry of Consumer Affairs, Food & Public Distribution</p>
         </div>
-
-        <div class="form-group">
-          <label for="farmerName">Farmer Name:</label>
-          <input type="text" id="farmerName" placeholder="Enter Full Name" required>
+        <div class="flex items-center gap-2">
+            <label for="langSelect" class="text-xs font-semibold uppercase">Language / भाषा:</label>
+            <select id="langSelect" class="bg-white text-slate-800 text-sm font-semibold py-1 px-3 rounded shadow focus:outline-none">
+                <option value="en">English</option>
+                <option value="hi">हिन्दी (Hindi)</option>
+                <option value="mr">मराठी (Marathi)</option>
+            </select>
         </div>
+    </header>
 
-        <div class="form-group">
-          <label for="mobileNo">Mobile Number:</label>
-          <div class="otp-box">
-            <input type="tel" id="mobileNo" placeholder="10-digit number" required pattern="[0-9]{10}">
-            <button type="button" onclick="sendDemoOTP()">Get Demo OTP</button>
-          </div>
-        </div>
+    <!-- Navigation Tabs -->
+    <nav class="bg-white shadow-sm border-b flex justify-center text-sm font-medium">
+        <button id="tab-farmer" class="nav-tab px-6 py-3 active-tab hover:text-green-700 transition">👨‍🌾 Farmer Portal</button>
+        <button id="tab-officer" class="nav-tab px-6 py-3 text-slate-600 hover:text-green-700 transition">👮 Officer Dashboard</button>
+        <button id="tab-summary" class="nav-tab px-6 py-3 text-slate-600 hover:text-green-700 transition">📊 Summary Box</button>
+    </nav>
 
-        <div id="otpSection" style="display:none;" class="card">
-          <p>Demo OTP: <strong id="demoOtpDisplay" style="color:var(--accent);"></strong> (Expires in <span id="timer">20</span>s)</p>
-          <input type="text" id="enteredOtp" placeholder="Enter 4-digit OTP">
-          <button type="button" class="btn-main" onclick="verifyOTP()">Verify OTP</button>
-        </div>
+    <main class="max-w-4xl mx-auto p-4 sm:p-6">
 
-        <div class="form-group">
-          <label for="cropQty">Crop Quantity (in Tons):</label>
-          <input type="number" id="cropQty" min="0.1" step="0.1" placeholder="e.g. 5.0" required>
-        </div>
+        <!-- 1. FARMER PORTAL -->
+        <section id="sec-farmer" class="space-y-6">
+            
+            <!-- OTP Module -->
+            <div id="otp-card" class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h2 id="lbl-otp-title" class="text-lg font-bold text-slate-800 mb-2">1. Farmer Mobile Authentication</h2>
+                <p id="lbl-otp-desc" class="text-xs text-slate-500 mb-4">Enter your mobile number to get a temporary demo verification OTP.</p>
 
-        <div class="form-group">
-          <label for="timeSlot">Preferred Shift Window:</label>
-          <select id="timeSlot" required>
-            <option value="08:00 AM">Morning Shift (Starting 08:00 AM)</option>
-            <option value="10:00 AM">Mid-Day Shift (Starting 10:00 AM)</option>
-            <option value="01:00 PM">Afternoon Shift (Starting 01:00 PM)</option>
-            <option value="03:00 PM">Evening Shift (Starting 03:00 PM)</option>
-          </select>
-        </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <input type="tel" id="mobileNo" placeholder="Enter 10-digit mobile number" class="border border-slate-300 rounded px-3 py-2 flex-grow focus:ring-2 focus:ring-green-500 outline-none">
+                    <button id="btn-gen-otp" class="bg-green-700 hover:bg-green-800 text-white font-medium px-5 py-2 rounded transition">Generate OTP</button>
+                </div>
 
-        <div class="form-group">
-          <label for="languagePref">Preferred Language (Bhashini Multi-lingual):</label>
-          <select id="languagePref">
-            <option value="hi-IN">Hindi (हिंदी)</option>
-            <option value="mr-IN">Marathi (मराठी)</option>
-            <option value="en-US">English</option>
-          </select>
-        </div>
+                <div id="otpBox" class="hidden mt-4 p-4 bg-amber-50 border border-amber-200 rounded-lg">
+                    <p class="text-sm text-amber-800 font-medium">Demo OTP Code: <span id="demoOtpVal" class="font-bold text-lg text-amber-900 tracking-widest">---</span></p>
+                    <p class="text-xs text-amber-700 mt-1">OTP Expires in: <span id="otpTimer" class="font-bold text-red-600">20</span> seconds</p>
+                    <div class="flex gap-2 mt-3">
+                        <input type="text" id="otpInput" maxlength="4" placeholder="Enter OTP" class="border border-slate-300 rounded px-3 py-1 w-32 text-center text-lg tracking-widest">
+                        <button id="btn-verify-otp" class="bg-amber-600 hover:bg-amber-700 text-white text-sm px-4 py-1.5 rounded transition">Verify</button>
+                    </div>
+                </div>
+            </div>
 
-        <button type="submit" id="bookBtn" class="btn-main" disabled>Book Gate-Pass Slot</button>
-      </form>
+            <!-- Booking Module -->
+            <div id="booking-card" class="bg-white p-6 rounded-xl shadow-md border border-slate-200 opacity-50 pointer-events-none transition-all">
+                <h2 id="lbl-booking-title" class="text-lg font-bold text-slate-800 mb-4">2. Mandi Slot Booking</h2>
 
-      <div id="ticketResult" class="card" style="display:none; margin-top:20px;">
-        <h4 style="color:var(--primary); margin-top:0;">Slot Confirmed! (Gate Pass Issued)</h4>
-        
-        <div class="ticket-grid">
-          <div>
-            <p><strong>Mandi:</strong> <span id="lblMandi"></span></p>
-            <p><strong>Token ID:</strong> <span id="lblToken"></span></p>
-            <p><strong>Queue Position:</strong> <span id="lblQueuePos" style="color:var(--accent); font-weight:bold;"></span></p>
-            <p><strong>Exact Arrival Time:</strong> <span id="lblExactTime" style="color:var(--primary); font-weight:bold;"></span></p>
-            <p><strong>Shift Window:</strong> <span id="lblSlot"></span></p>
-          </div>
-          <div style="text-align: center;">
-            <p><strong>Gate Pass QR Code</strong></p>
-            <div id="qrcode" style="display:inline-block; padding:10px; background:#fff; border:1px solid #ccc;"></div>
-          </div>
-        </div>
+                <form id="bookingForm" class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label id="lbl-farmer-name" class="block text-xs font-bold text-slate-700 mb-1">Farmer Name</label>
+                            <input type="text" id="farmerName" required placeholder="Name" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label id="lbl-mandi-select" class="block text-xs font-bold text-slate-700 mb-1">Select Real Mandi Location</label>
+                            <select id="mandiSelect" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+                                <option value="Azadpur Mandi (Delhi)">Azadpur Mandi (Delhi)</option>
+                                <option value="Vashi APMC (Mumbai)">Vashi APMC (Mumbai)</option>
+                                <option value="Lasalgaon Mandi (Nashik)">Lasalgaon Mandi (Nashik)</option>
+                                <option value="Kalyan APMC (Maharashtra)">Kalyan APMC (Maharashtra)</option>
+                            </select>
+                        </div>
+                    </div>
 
-        <div class="alert" style="margin-top:15px;">
-          <strong>Bhashini Message Alert:</strong>
-          <p id="bhashiniTextMsg"></p>
-          <button type="button" onclick="playVoiceMessage()">🔊 Play Audio Message</button>
-        </div>
-      </div>
-    </div>
+                    <div class="bg-slate-50 p-3 rounded border text-xs text-slate-600 flex justify-between items-center">
+                        <span>Daily Intake Capacity Limit: <strong>50 Tons</strong></span>
+                        <span id="capacityStatus" class="font-bold text-green-700">Booked: 0 / 50 Tons</span>
+                    </div>
 
-    <!-- 2. OFFICER SECTION -->
-    <div id="officerTab" class="section">
-      <h3>Mandi Officer Dashboard & QR Scanner</h3>
-      <div class="card">
-        <label for="maxTarget">Set Daily Maximum Capacity Target (Tons):</label>
-        <input type="number" id="maxTarget" value="50">
-        <button class="btn-main" onclick="updateTarget()" style="margin-top:5px;">Update Limit</button>
-      </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label id="lbl-quantity" class="block text-xs font-bold text-slate-700 mb-1">Produce Quantity (In Tons)</label>
+                            <input type="number" id="produceWeight" min="0.5" max="50" step="0.5" required placeholder="e.g. 5" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label id="lbl-slot-time" class="block text-xs font-bold text-slate-700 mb-1">Booking Slot Time (9 AM to 5 PM)</label>
+                            <select id="slotTime" class="w-full border rounded px-3 py-2 focus:ring-2 focus:ring-green-500 outline-none">
+                                <option value="09:00 AM">09:00 AM - 10:00 AM</option>
+                                <option value="10:00 AM">10:00 AM - 11:00 AM</option>
+                                <option value="11:00 AM">11:00 AM - 12:00 PM</option>
+                                <option value="12:00 PM">12:00 PM - 01:00 PM</option>
+                                <option value="01:00 PM">01:00 PM - 02:00 PM</option>
+                                <option value="02:00 PM">02:00 PM - 03:00 PM</option>
+                                <option value="03:00 PM">03:00 PM - 04:00 PM</option>
+                                <option value="04:00 PM">04:00 PM - 05:00 PM</option>
+                            </select>
+                        </div>
+                    </div>
 
-      <h4>Gate Scanner Simulation</h4>
-      <div class="card">
-        <label for="verifyTokenInput">Verify / Scan Gate Pass Token:</label>
-        <input type="text" id="verifyTokenInput" placeholder="Enter or scan Token ID (e.g. MND-12345)">
-        <button class="btn-main" onclick="verifyTokenByOfficer()">Verify Gate Token</button>
-        <div id="verificationResult" style="margin-top:10px; font-weight:bold;"></div>
-      </div>
+                    <button type="submit" id="btn-submit-booking" class="w-full bg-green-700 hover:bg-green-800 text-white font-bold py-3 rounded shadow transition">Confirm & Book Slot</button>
+                </form>
+            </div>
 
-      <h4>Send Instant SMS Alerts to Farmers</h4>
-      <div class="card">
-        <label for="smsFarmerList">Select Target Farmer Token:</label>
-        <select id="smsFarmerList"></select>
-        <label for="customSms" style="margin-top:10px;">Custom Alert Message:</label>
-        <input type="text" id="customSms" placeholder="e.g. Bring valid Kisan ID card at gate">
-        <button class="btn-main" onclick="sendSmsAlert()">Send Broadcast SMS</button>
-      </div>
-    </div>
+            <!-- Gate Pass Ticket Display -->
+            <div id="ticket-card" class="hidden bg-white p-6 rounded-xl shadow-lg border-2 border-green-600 text-center space-y-4">
+                <div class="inline-block bg-green-100 text-green-800 font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider">
+                    Gate-Pass Token Generated
+                </div>
+                <h3 id="ticket-token-id" class="text-3xl font-extrabold text-slate-800">Token #101</h3>
+                
+                <div class="grid grid-cols-2 gap-4 text-left bg-slate-50 p-4 rounded-lg text-sm border">
+                    <div>
+                        <p id="lbl-pos-text" class="text-xs text-slate-500">Queue Position</p>
+                        <p id="ticket-queue-pos" class="font-bold text-lg text-green-700">#1 in Line</p>
+                    </div>
+                    <div>
+                        <p id="lbl-eta-text" class="text-xs text-slate-500">Exact Arrival Time</p>
+                        <p id="ticket-arrival-time" class="font-bold text-lg text-slate-800">09:00 AM</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500">Selected Mandi</p>
+                        <p id="ticket-mandi" class="font-semibold text-slate-700">Azadpur Mandi</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-slate-500">Estimated Weight</p>
+                        <p id="ticket-weight" class="font-semibold text-slate-700">5 Tons</p>
+                    </div>
+                </div>
 
-    <!-- 3. MACHINE SLOWDOWN SECTION -->
-    <div id="machineTab" class="section">
-      <h3>Weighbridge & Machine Operations</h3>
-      <div class="alert">
-        <strong>Dynamic Queue Controller:</strong> Throttle incoming slots if weighbridges experience mechanical failure or slowdown.
-      </div>
-      <div class="card">
-        <label for="machineStatus">Weighbridge Machine Status:</label>
-        <select id="machineStatus" onchange="toggleMachineStatus()">
-          <option value="NORMAL">Normal Speed (100% Intake - 15 mins/farmer)</option>
-          <option value="SLOW">Slowdown / Technical Delay (50% Intake - 30 mins/farmer)</option>
-          <option value="HALT">Machine Breakdown (Stop Registrations)</option>
-        </select>
-      </div>
-      <p>Current System Adjustment: <strong id="speedStatus">Normal Operations</strong></p>
-    </div>
+                <div class="flex flex-col items-center justify-center p-3 bg-white border rounded">
+                    <div id="qrcode"></div>
+                    <p class="text-xs text-slate-400 mt-2">Scan at Mandi Gate for Verification</p>
+                </div>
 
-    <!-- 4. DAILY SUMMARY SECTION -->
-    <div id="summaryTab" class="section">
-      <h3>Daily Procurement Summary</h3>
-      <div class="summary-grid">
-        <div class="summary-card">
-          <h4>Total Collected</h4>
-          <h3 id="sumQty">0 Tons</h3>
-        </div>
-        <div class="summary-card">
-          <h4>Max Capacity Limit</h4>
-          <h3 id="sumLimit">50 Tons</h3>
-        </div>
-        <div class="summary-card">
-          <h4>Government MSP Rate</h4>
-          <h3>₹22,750 / Ton</h3>
-        </div>
-        <div class="summary-card">
-          <h4>Total Trade Value</h4>
-          <h3 id="sumValue">₹0</h3>
-        </div>
-      </div>
+                <div class="pt-2 flex justify-center gap-2">
+                    <button id="btn-replay-audio" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-4 py-2 rounded-full flex items-center gap-1 shadow">
+                        🔊 Replay Audio Info
+                    </button>
+                </div>
+            </div>
 
-      <h4>Registered Farmers Log</h4>
-      <div id="farmersListLog"></div>
-    </div>
+            <!-- SMS Notification Alert Box -->
+            <div id="smsAlertBox" class="hidden bg-amber-50 border-l-4 border-amber-500 p-4 rounded shadow-sm">
+                <div class="flex items-start">
+                    <span class="text-amber-500 text-xl mr-3">📱</span>
+                    <div>
+                        <p class="font-bold text-amber-800 text-xs uppercase tracking-wider">SMS Notification Received</p>
+                        <p id="smsAlertText" class="text-sm text-amber-900 mt-1 font-mono">Notice: Weighbridge processing is delayed. Your estimated arrival time has been updated.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
 
-  </div>
+        <!-- 2. OFFICER DASHBOARD -->
+        <section id="sec-officer" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h2 class="text-lg font-bold text-slate-800 mb-4">Gate Pass Inspection & Weighbridge Recording</h2>
 
-  <script src="script.js"></script>
+                <div class="border rounded-lg p-4 bg-slate-50 mb-6 text-center">
+                    <h3 class="text-sm font-semibold text-slate-700 mb-3">1. Scan Farmer Gate Pass QR Code</h3>
+                    <div id="reader" class="max-w-xs mx-auto mb-3 bg-slate-200 rounded overflow-hidden"></div>
+                    <div class="flex justify-center gap-2">
+                        <button id="btn-start-cam" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-4 py-2 rounded">Start Camera Scan</button>
+                        <button id="btn-stop-cam" class="bg-slate-500 hover:bg-slate-600 text-white text-xs px-4 py-2 rounded">Stop Camera</button>
+                    </div>
+
+                    <div class="relative flex py-3 items-center">
+                        <div class="flex-grow border-t border-slate-300"></div>
+                        <span class="flex-shrink mx-4 text-xs text-slate-400 font-semibold">OR MANUAL OVERRIDE</span>
+                        <div class="flex-grow border-t border-slate-300"></div>
+                    </div>
+
+                    <div class="flex gap-2 max-w-sm mx-auto">
+                        <input type="text" id="manualTokenInput" placeholder="Enter Token ID (e.g. TKN-101)" class="border rounded px-3 py-1.5 text-sm flex-grow">
+                        <button id="btn-fetch-manual" class="bg-slate-700 text-white text-sm px-4 py-1.5 rounded">Fetch</button>
+                    </div>
+                </div>
+
+                <div id="weighbridgeForm" class="hidden border-t pt-4 space-y-4">
+                    <h3 class="text-sm font-bold text-slate-800">2. Weighbridge Data Logging for <span id="officer-token-id" class="text-green-700">---</span></h3>
+                    <p class="text-xs text-slate-500">Farmer: <span id="officer-farmer-name" class="font-semibold text-slate-700">---</span></p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">Actual Measured Weight (Tons)</label>
+                            <input type="number" id="actualWeight" step="0.1" required class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-slate-700 mb-1">MSP Rate per Ton (₹)</label>
+                            <input type="number" id="mspRate" value="22750" class="w-full border rounded px-3 py-2 text-sm focus:ring-2 focus:ring-green-500 outline-none">
+                        </div>
+                    </div>
+
+                    <button id="btn-complete-pay" class="w-full bg-emerald-700 hover:bg-emerald-800 text-white font-bold py-2.5 rounded shadow transition text-sm">
+                        Confirm Weighing & Generate Payment Record
+                    </button>
+                </div>
+
+                <hr class="my-6">
+
+                <div>
+                    <h3 class="text-sm font-bold text-slate-800 mb-2">3. Dynamic Intake Throttle Control</h3>
+                    <p class="text-xs text-slate-500 mb-3">Slowing down vehicle intake dynamically recalculates queued farmers' arrival times and sends automated SMS alerts[cite: 2].</p>
+                    
+                    <div class="flex gap-3">
+                        <button id="btn-speed-slow" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded shadow">
+                            ⚠️ Slow Down Processing (+15 min delay)
+                        </button>
+                        <button id="btn-speed-normal" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded shadow">
+                            🔄 Restore Normal Speed
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. SUMMARY BOX -->
+        <section id="sec-summary" class="hidden space-y-6">
+            <div class="bg-white p-6 rounded-xl shadow-md border border-slate-200">
+                <h2 id="lbl-summary-title" class="text-lg font-bold text-slate-800 mb-4">Mandis Daily Operational Summary</h2>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                    <div class="bg-green-50 border border-green-200 p-4 rounded-xl text-center">
+                        <p id="lbl-total-goods" class="text-xs font-bold text-green-800 uppercase tracking-wider">Total Goods Collected</p>
+                        <p id="sumTotalGoods" class="text-3xl font-black text-green-700 mt-1">0.0 Tons</p>
+                    </div>
+                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-xl text-center">
+                        <p id="lbl-total-money" class="text-xs font-bold text-emerald-800 uppercase tracking-wider">Total Money Disbursed</p>
+                        <p id="sumTotalMoney" class="text-3xl font-black text-emerald-700 mt-1">₹ 0</p>
+                    </div>
+                </div>
+
+                <h3 class="text-xs font-bold text-slate-600 uppercase mb-2">Completed Transactions Log</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs border-collapse">
+                        <thead>
+                            <tr class="bg-slate-100 border-b border-slate-200 text-slate-600">
+                                <th class="p-3">Token #</th>
+                                <th class="p-3">Farmer</th>
+                                <th class="p-3">Mandi Location</th>
+                                <th class="p-3">Weight (Tons)</th>
+                                <th class="p-3">Payment Disbursed</th>
+                                <th class="p-3">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="summaryTableBody" class="divide-y divide-slate-100">
+                            <tr>
+                                <td colspan="6" class="p-4 text-center text-slate-400">No completed entries logged today.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- JavaScript Script File -->
+    <script src="script.js"></script>
 </body>
 </html>
