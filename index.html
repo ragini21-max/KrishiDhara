@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Smart Mandi Queue Management System</title>
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
 <body>
 
@@ -26,7 +27,7 @@
     <div id="farmerTab" class="section active">
       <h3>Farmer Registration & Slot Booking</h3>
       <div id="registrationBlocked" class="alert" style="display:none; background:#ffebee; border-color:#f44336; color:#c62828;">
-        <strong>Notice:</strong> Target daily procurement quantity reached for today. Registration is closed.
+        <strong>Notice:</strong> Target daily procurement capacity reached for today. Registration is closed.
       </div>
 
       <form id="farmerForm">
@@ -60,17 +61,17 @@
         </div>
 
         <div class="form-group">
-          <label for="cropQty">Crop Quantity (in Quintals):</label>
-          <input type="number" id="cropQty" min="1" placeholder="e.g. 50" required>
+          <label for="cropQty">Crop Quantity (in Tons):</label>
+          <input type="number" id="cropQty" min="0.1" step="0.1" placeholder="e.g. 5.0" required>
         </div>
 
         <div class="form-group">
-          <label for="timeSlot">Preferred Time Slot:</label>
+          <label for="timeSlot">Preferred Shift Window:</label>
           <select id="timeSlot" required>
-            <option value="08:00 AM - 10:00 AM">08:00 AM - 10:00 AM</option>
-            <option value="10:00 AM - 12:00 PM">10:00 AM - 12:00 PM</option>
-            <option value="01:00 PM - 03:00 PM">01:00 PM - 03:00 PM</option>
-            <option value="03:00 PM - 05:00 PM">03:00 PM - 05:00 PM</option>
+            <option value="08:00 AM">Morning Shift (Starting 08:00 AM)</option>
+            <option value="10:00 AM">Mid-Day Shift (Starting 10:00 AM)</option>
+            <option value="01:00 PM">Afternoon Shift (Starting 01:00 PM)</option>
+            <option value="03:00 PM">Evening Shift (Starting 03:00 PM)</option>
           </select>
         </div>
 
@@ -88,10 +89,22 @@
 
       <div id="ticketResult" class="card" style="display:none; margin-top:20px;">
         <h4 style="color:var(--primary); margin-top:0;">Slot Confirmed! (Gate Pass Issued)</h4>
-        <p><strong>Mandi:</strong> <span id="lblMandi"></span></p>
-        <p><strong>Token ID:</strong> <span id="lblToken"></span></p>
-        <p><strong>Strict Entry Window:</strong> <span id="lblSlot"></span></p>
-        <div class="alert">
+        
+        <div class="ticket-grid">
+          <div>
+            <p><strong>Mandi:</strong> <span id="lblMandi"></span></p>
+            <p><strong>Token ID:</strong> <span id="lblToken"></span></p>
+            <p><strong>Queue Position:</strong> <span id="lblQueuePos" style="color:var(--accent); font-weight:bold;"></span></p>
+            <p><strong>Exact Arrival Time:</strong> <span id="lblExactTime" style="color:var(--primary); font-weight:bold;"></span></p>
+            <p><strong>Shift Window:</strong> <span id="lblSlot"></span></p>
+          </div>
+          <div style="text-align: center;">
+            <p><strong>Gate Pass QR Code</strong></p>
+            <div id="qrcode" style="display:inline-block; padding:10px; background:#fff; border:1px solid #ccc;"></div>
+          </div>
+        </div>
+
+        <div class="alert" style="margin-top:15px;">
           <strong>Bhashini Message Alert:</strong>
           <p id="bhashiniTextMsg"></p>
           <button type="button" onclick="playVoiceMessage()">🔊 Play Audio Message</button>
@@ -101,11 +114,19 @@
 
     <!-- 2. OFFICER SECTION -->
     <div id="officerTab" class="section">
-      <h3>Mandi Officer Dashboard</h3>
+      <h3>Mandi Officer Dashboard & QR Scanner</h3>
       <div class="card">
-        <label for="maxTarget">Set Daily Maximum Capacity Target (Quintals):</label>
-        <input type="number" id="maxTarget" value="500">
+        <label for="maxTarget">Set Daily Maximum Capacity Target (Tons):</label>
+        <input type="number" id="maxTarget" value="50">
         <button class="btn-main" onclick="updateTarget()" style="margin-top:5px;">Update Limit</button>
+      </div>
+
+      <h4>Gate Scanner Simulation</h4>
+      <div class="card">
+        <label for="verifyTokenInput">Verify / Scan Gate Pass Token:</label>
+        <input type="text" id="verifyTokenInput" placeholder="Enter or scan Token ID (e.g. MND-12345)">
+        <button class="btn-main" onclick="verifyTokenByOfficer()">Verify Gate Token</button>
+        <div id="verificationResult" style="margin-top:10px; font-weight:bold;"></div>
       </div>
 
       <h4>Send Instant SMS Alerts to Farmers</h4>
@@ -127,8 +148,8 @@
       <div class="card">
         <label for="machineStatus">Weighbridge Machine Status:</label>
         <select id="machineStatus" onchange="toggleMachineStatus()">
-          <option value="NORMAL">Normal Speed (100% Intake)</option>
-          <option value="SLOW">Slowdown / Technical Delay (50% Intake)</option>
+          <option value="NORMAL">Normal Speed (100% Intake - 15 mins/farmer)</option>
+          <option value="SLOW">Slowdown / Technical Delay (50% Intake - 30 mins/farmer)</option>
           <option value="HALT">Machine Breakdown (Stop Registrations)</option>
         </select>
       </div>
@@ -141,15 +162,15 @@
       <div class="summary-grid">
         <div class="summary-card">
           <h4>Total Collected</h4>
-          <h3 id="sumQty">0 Qtl</h3>
+          <h3 id="sumQty">0 Tons</h3>
         </div>
         <div class="summary-card">
           <h4>Max Capacity Limit</h4>
-          <h3 id="sumLimit">500 Qtl</h3>
+          <h3 id="sumLimit">50 Tons</h3>
         </div>
         <div class="summary-card">
           <h4>Government MSP Rate</h4>
-          <h3>₹2,275 / Qtl</h3>
+          <h3>₹22,750 / Ton</h3>
         </div>
         <div class="summary-card">
           <h4>Total Trade Value</h4>
