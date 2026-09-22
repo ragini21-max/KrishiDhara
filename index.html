@@ -32,7 +32,7 @@
 
     <!-- Navigation Tabs -->
     <nav class="bg-white shadow-sm border-b flex justify-center text-sm font-medium">
-        <button id="tab-farmer" class="nav-tab px-6 py-3 active-tab hover:text-green-700 transition">👨‍🌾 Farmer Portal</button>
+        <button id="tab-farmer" class="nav-tab px-6 py-3 font-semibold text-green-800 border-b-2 border-green-700 hover:text-green-700 transition">👨‍🌾 Farmer Portal</button>
         <button id="tab-officer" class="nav-tab px-6 py-3 text-slate-600 hover:text-green-700 transition">👮 Officer Dashboard</button>
         <button id="tab-summary" class="nav-tab px-6 py-3 text-slate-600 hover:text-green-700 transition">📊 Summary Box</button>
     </nav>
@@ -139,7 +139,7 @@
                 </div>
 
                 <div class="flex flex-col items-center justify-center p-3 bg-white border rounded">
-                    <div id="qrcode"></div>
+                    <div id="qrcode" class="w-[128px] h-[128px] flex items-center justify-center"></div>
                     <p class="text-xs text-slate-400 mt-2">Scan at Mandi Gate for Verification</p>
                 </div>
 
@@ -211,7 +211,7 @@
 
                 <div>
                     <h3 class="text-sm font-bold text-slate-800 mb-2">3. Dynamic Intake Throttle Control</h3>
-                    <p class="text-xs text-slate-500 mb-3">Slowing down vehicle intake dynamically recalculates queued farmers' arrival times and sends automated SMS alerts[cite: 2].</p>
+                    <p class="text-xs text-slate-500 mb-3">Slowing down vehicle intake dynamically recalculates queued farmers' arrival times and sends automated SMS alerts.</p>
                     
                     <div class="flex gap-3">
                         <button id="btn-speed-slow" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-4 py-2 rounded shadow">
