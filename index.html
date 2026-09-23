@@ -1,225 +1,403 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mandi Management System</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Custom Styles -->
-    <link rel="stylesheet" href="styles.css">
-    <!-- QRCode Generator Library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    <!-- HTML5 QR Code Scanner Library -->
-    <script src="https://unpkg.com/html5-qrcode"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Mandi Engine - APMC Dynamic Queue & Pass</title>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- CSS File -->
+  <link rel="stylesheet" href="styles.css">
 </head>
-<body class="bg-slate-100 font-sans min-h-screen text-slate-800">
+<body>
 
-    <!-- Header Navigation -->
-    <header class="bg-emerald-800 text-white p-4 shadow-md">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold">Mandi Slot Management</h1>
-            <select id="langSelect" class="bg-emerald-700 text-white px-3 py-1 rounded border border-emerald-600">
-                <option value="en">English</option>
-                <option value="hi">हिंदी</option>
-                <option value="mr">मराठी</option>
-            </select>
+  <!-- Top Header Banner -->
+  <header class="header">
+    <div class="header-content">
+      <div class="brand">
+        <div class="brand-logo">
+          <i class="fa-solid fa-wheat-awn"></i>
         </div>
-    </header>
+        <div>
+          <h1 class="brand-title">Smart Mandi Engine</h1>
+          <p class="brand-subtitle">APMC Dynamic Queue & Pass</p>
+        </div>
+      </div>
+
+      <!-- Language Selector (Bhashini Engine: English / Hindi Only) -->
+      <div class="lang-selector-wrapper">
+        <i class="fa-solid fa-language lang-icon"></i>
+        <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
+          <option value="en">English (Bhashini AI)</option>
+          <option value="hi">हिन्दी (भाषिणी AI)</option>
+        </select>
+      </div>
+    </div>
 
     <!-- Navigation Tabs -->
-    <nav class="bg-white border-b border-slate-200">
-        <div class="max-w-4xl mx-auto flex border-b">
-            <button id="tab-farmer" class="py-3 px-6 text-slate-600 hover:text-green-800 font-medium active-tab">Farmer Portal</button>
-            <button id="tab-officer" class="py-3 px-6 text-slate-600 hover:text-green-800 font-medium">Officer Verification</button>
-            <button id="tab-summary" class="py-3 px-6 text-slate-600 hover:text-green-800 font-medium">Daily Summary</button>
-        </div>
+    <nav class="nav-tabs">
+      <button class="nav-btn active" id="tab-farmer" onclick="switchTab('farmer')">
+        <span class="nav-icon"><i class="fa-solid fa-tractor"></i></span>
+        <span class="nav-label" data-i18n="tabFarmer">Farmer App</span>
+      </button>
+      <button class="nav-btn" id="tab-officer" onclick="switchTab('officer')">
+        <span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span>
+        <span class="nav-label" data-i18n="tabOfficer">Officer Desk</span>
+      </button>
+      <button class="nav-btn" id="tab-queue" onclick="switchTab('queue')">
+        <span class="nav-icon"><i class="fa-solid fa-gears"></i></span>
+        <span class="nav-label" data-i18n="tabQueue">Queue Engine</span>
+      </button>
+      <button class="nav-btn" id="tab-sms" onclick="switchTab('sms')">
+        <span class="nav-icon"><i class="fa-solid fa-comment-dots"></i></span>
+        <span class="nav-label" data-i18n="tabSms">SMS Logs</span>
+      </button>
     </nav>
+  </header>
 
-    <!-- Main Container -->
-    <main class="max-w-4xl mx-auto p-4">
+  <!-- Main Content Container -->
+  <main class="container">
 
-        <!-- Farmer Section -->
-        <section id="sec-farmer">
-            <!-- Mobile OTP Authentication Card -->
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 mb-6">
-                <h2 id="lbl-otp-title" class="text-lg font-bold text-slate-800 mb-2">1. Farmer Mobile Authentication</h2>
-                <p id="lbl-otp-desc" class="text-sm text-slate-600 mb-4">Enter your mobile number to get a temporary demo verification OTP.</p>
-                <div class="flex gap-3 max-w-md">
-                    <input type="tel" id="mobileNo" placeholder="10-digit mobile number" class="border p-2 rounded w-full">
-                    <button id="btn-gen-otp" class="bg-emerald-600 text-white px-4 py-2 rounded hover:bg-emerald-700 font-semibold whitespace-nowrap">Send OTP</button>
-                </div>
+    <!-- ==================== TAB 01: FARMER APP ==================== -->
+    <section id="sec-farmer" class="tab-section active">
+      <div class="section-badge">01</div>
+      <h2 class="section-title" data-i18n="farmerTitle">Farmer Portal & Digital Pass</h2>
+      <p class="section-sub" data-i18n="farmerSub">Verify your mobile number and reserve a procurement slot.</p>
 
-                <div id="otpBox" class="mt-4 p-4 bg-slate-50 border rounded-lg hidden">
-                    <p class="text-sm font-semibold">Demo OTP: <span id="demoOtpVal" class="text-emerald-700 text-lg">----</span> (Expires in <span id="otpTimer">20</span>s)</p>
-                    <div class="flex gap-3 mt-2 max-w-md">
-                        <input type="text" id="otpInput" placeholder="Enter 4-digit OTP" class="border p-2 rounded w-full">
-                        <button id="btn-verify-otp" class="bg-slate-800 text-white px-4 py-2 rounded hover:bg-slate-900 font-semibold whitespace-nowrap">Verify</button>
-                    </div>
-                </div>
+      <!-- Main Layout with Mandi Capacity Side Box -->
+      <div class="grid-layout">
+        
+        <!-- Left / Primary Column: OTP & Digital Gate Pass -->
+        <div class="main-column">
+          
+          <!-- Step 1: Kisan OTP Authentication -->
+          <div class="card" id="otpCard">
+            <div class="card-header">
+              <div class="badge-num">1</div>
+              <div>
+                <h3 class="card-title" data-i18n="kisanOtpTitle">Kisan OTP Authentication</h3>
+                <p class="card-desc" data-i18n="kisanOtpDesc">Use your registered mobile number.</p>
+              </div>
             </div>
 
-            <!-- Booking Card -->
-            <div id="booking-card" class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 opacity-50 pointer-events-none transition-all">
-                <h2 id="lbl-booking-title" class="text-lg font-bold text-slate-800 mb-4">2. Mandi Slot Booking</h2>
-                <form id="bookingForm" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label id="lbl-farmer-name" class="block text-sm font-semibold mb-1">Farmer Name</label>
-                        <input type="text" id="farmerName" required class="border p-2 rounded w-full">
-                    </div>
-                    <div>
-                        <label id="lbl-mandi-select" class="block text-sm font-semibold mb-1">Select Real Mandi Location</label>
-                        <select id="mandiSelect" class="border p-2 rounded w-full">
-                            <option value="Azadpur Mandi (Delhi)">Azadpur Mandi (Delhi)</option>
-                            <option value="Vashi APMC (Mumbai)">Vashi APMC (Mumbai)</option>
-                            <option value="Lasalgaon Mandi (Nashik)">Lasalgaon Mandi (Nashik)</option>
-                            <option value="Kalyan APMC (Maharashtra)">Kalyan APMC (Maharashtra)</option>
-                        </select>
-                        <p id="capacityStatus" class="text-xs mt-1 font-bold text-green-700">Booked: 0 / 50 Tons</p>
-                    </div>
-                    <div>
-                        <label id="lbl-quantity" class="block text-sm font-semibold mb-1">Produce Quantity (In Tons)</label>
-                        <input type="number" id="produceWeight" min="0.1" max="50" step="0.1" required class="border p-2 rounded w-full">
-                    </div>
-                    <div>
-                        <label id="lbl-slot-time" class="block text-sm font-semibold mb-1">Booking Slot Time (9 AM to 5 PM)</label>
-                        <select id="slotTime" class="border p-2 rounded w-full">
-                            <option value="09:00 AM">09:00 AM</option>
-                            <option value="10:00 AM">10:00 AM</option>
-                            <option value="11:00 AM">11:00 AM</option>
-                            <option value="12:00 PM">12:00 PM</option>
-                            <option value="01:00 PM">01:00 PM</option>
-                            <option value="02:00 PM">02:00 PM</option>
-                            <option value="03:00 PM">03:00 PM</option>
-                            <option value="04:00 PM">04:00 PM</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <button type="submit" id="btn-submit-booking" class="bg-emerald-600 text-white px-6 py-2 rounded font-bold hover:bg-emerald-700 w-full">Confirm & Book Slot</button>
-                    </div>
-                </form>
+            <div class="form-group">
+              <label class="form-label" data-i18n="mobileLabel">Mobile Number</label>
+              <div class="input-phone">
+                <span class="phone-prefix">+91</span>
+                <input type="tel" id="mobileInput" placeholder="Enter 10-digit mobile number" maxlength="10">
+              </div>
             </div>
 
-            <!-- SMS Alert Banner -->
-            <div id="smsAlertBox" class="mt-4 bg-amber-50 border-l-4 border-amber-500 p-4 rounded hidden">
-                <p id="smsAlertText" class="text-sm text-amber-800 font-medium"></p>
+            <!-- OTP Input Box (Hidden initially) -->
+            <div id="otpInputGroup" class="otp-group hidden">
+              <label class="form-label" data-i18n="enterOtpLabel">Enter 6-Digit Demo OTP</label>
+              <input type="text" id="otpCodeInput" class="form-input otp-code" placeholder="------" maxlength="6">
+              
+              <div class="timer-box" id="timerBox">
+                <i class="fa-solid fa-clock"></i> <span data-i18n="timeRemaining">Time Remaining:</span> 
+                <span id="timerVal" class="timer-sec">20</span>s
+              </div>
             </div>
 
-            <!-- Confirmation Ticket Card -->
-            <div id="ticket-card" class="bg-white p-6 rounded-lg shadow-md border border-emerald-500 mt-6 hidden">
-                <div class="flex justify-between items-start border-b pb-4 mb-4">
-                    <div>
-                        <h3 class="text-emerald-800 font-bold text-xl" id="ticket-token-id">TKN-101</h3>
-                        <p class="text-sm text-slate-500" id="ticket-mandi">Mandi Location</p>
-                    </div>
-                    <button id="btn-replay-audio" class="bg-emerald-100 text-emerald-800 p-2 rounded-full hover:bg-emerald-200">
-                        🔊 Read Aloud
-                    </button>
-                </div>
-                <div class="grid grid-cols-2 gap-4 text-center mb-4">
-                    <div class="bg-slate-50 p-3 rounded">
-                        <p id="lbl-pos-text" class="text-xs text-slate-500">Queue Position</p>
-                        <p id="ticket-queue-pos" class="text-lg font-bold text-slate-800">#1 in Line</p>
-                    </div>
-                    <div class="bg-slate-50 p-3 rounded">
-                        <p id="lbl-eta-text" class="text-xs text-slate-500">Exact Arrival Time</p>
-                        <p id="ticket-arrival-time" class="text-lg font-bold text-emerald-700">09:00 AM</p>
-                    </div>
-                </div>
-                <div id="qrcode" class="flex justify-center my-4"></div>
-                <p class="text-xs text-center text-slate-400">Show this QR Code to the Mandi Gate Officer upon arrival.</p>
+            <button id="otpActionBtn" class="btn btn-primary btn-block" onclick="handleOtpClick()">
+              <span id="otpBtnText" data-i18n="sendOtp">Send OTP</span> &rarr;
+            </button>
+          </div>
+
+          <!-- Step 2: Digital Gate Pass (Generated after successful OTP) -->
+          <div class="card pass-card hidden" id="digitalPassCard">
+            <div class="pass-header">
+              <div>
+                <span class="pass-tag" data-i18n="securePass">SECURE PASS</span>
+                <h3 class="pass-title" data-i18n="digitalPassTitle">Digital Gate Pass</h3>
+              </div>
+              <span class="status-badge" data-i18n="slotConfirmed">SLOT CONFIRMED</span>
             </div>
-        </section>
 
-        <!-- Officer Verification Section -->
-        <section id="sec-officer" class="hidden">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200 mb-6">
-                <h2 class="text-lg font-bold text-slate-800 mb-4">Mandi Gate Verification</h2>
-                
-                <div class="flex gap-3 mb-4">
-                    <button id="btn-start-cam" class="bg-emerald-600 text-white px-4 py-2 rounded font-semibold text-sm">Start Camera</button>
-                    <button id="btn-stop-cam" class="bg-slate-600 text-white px-4 py-2 rounded font-semibold text-sm">Stop Camera</button>
-                </div>
-
-                <div id="reader" class="max-w-sm mx-auto mb-4"></div>
-
-                <div class="flex gap-2 max-w-md my-4">
-                    <input type="text" id="manualTokenInput" placeholder="Enter Token ID manually (e.g. TKN-101)" class="border p-2 rounded w-full">
-                    <button id="btn-fetch-manual" class="bg-slate-800 text-white px-4 py-2 rounded font-semibold whitespace-nowrap">Fetch Token</button>
-                </div>
-
-                <!-- Weighbridge Intake Form -->
-                <div id="weighbridgeForm" class="border-t pt-4 mt-4 hidden">
-                    <h3 class="font-bold text-slate-800 mb-2">Weighbridge Entry Form</h3>
-                    <p class="text-sm mb-1">Token: <span id="officer-token-id" class="font-bold"></span></p>
-                    <p class="text-sm mb-3">Farmer: <span id="officer-farmer-name" class="font-bold"></span></p>
-                    
-                    <div class="grid grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label class="block text-xs font-semibold mb-1">Actual Net Weight (Tons)</label>
-                            <input type="number" id="actualWeight" step="0.1" class="border p-2 rounded w-full">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-semibold mb-1">Government MSP Rate (₹ / Ton)</label>
-                            <input type="number" id="mspRate" value="21830" class="border p-2 rounded w-full">
-                        </div>
-                    </div>
-
-                    <button id="btn-complete-pay" class="bg-emerald-700 text-white px-4 py-2 rounded font-bold w-full">Process Entry & Complete Payment</button>
-                </div>
-
-                <!-- Delay Simulation Controls -->
-                <div class="border-t pt-4 mt-6">
-                    <h4 class="text-xs font-bold uppercase text-slate-400 mb-2">Simulate Gate Congestion Controls</h4>
-                    <div class="flex gap-2">
-                        <button id="btn-speed-slow" class="bg-amber-100 text-amber-800 px-3 py-1 rounded text-xs font-bold border border-amber-300">Simulate Traffic Delay (+15 mins)</button>
-                        <button id="btn-speed-normal" class="bg-slate-100 text-slate-800 px-3 py-1 rounded text-xs font-bold border">Restore Normal Speed</button>
-                    </div>
-                </div>
+            <!-- QR Code Section -->
+            <div class="qr-box">
+              <img id="qrImage" src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=MND-68019" alt="Pass QR Code" class="qr-img">
+              <div class="token-id" id="passTokenDisplay">#MND-68019</div>
+              <p class="qr-instruction" data-i18n="showQrText">Show this QR code at the entry gate.</p>
             </div>
-        </section>
 
-        <!-- Summary Section -->
-        <section id="sec-summary" class="hidden">
-            <div class="bg-white p-6 rounded-lg shadow-sm border border-slate-200">
-                <h2 id="lbl-summary-title" class="text-lg font-bold text-slate-800 mb-4">Mandis Daily Operational Summary</h2>
-                
-                <div class="grid grid-cols-2 gap-4 mb-6">
-                    <div class="bg-emerald-50 border border-emerald-200 p-4 rounded-lg">
-                        <p id="lbl-total-goods" class="text-xs text-emerald-600 font-semibold uppercase">Total Goods Collected</p>
-                        <p id="sumTotalGoods" class="text-2xl font-bold text-emerald-800">0.0 Tons</p>
-                    </div>
-                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg">
-                        <p id="lbl-total-money" class="text-xs text-blue-600 font-semibold uppercase">Total Money Disbursed</p>
-                        <p id="sumTotalMoney" class="text-2xl font-bold text-blue-800">₹ 0</p>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-slate-100 border-b">
-                            <tr>
-                                <th class="p-3 font-semibold">Token ID</th>
-                                <th class="p-3 font-semibold">Farmer</th>
-                                <th class="p-3 font-semibold">Mandi</th>
-                                <th class="p-3 font-semibold">Net Weight</th>
-                                <th class="p-3 font-semibold">Disbursed Amount</th>
-                                <th class="p-3 font-semibold">Status</th>
-                            </tr>
-                        </thead>
-                        <tbody id="summaryTableBody">
-                            <tr>
-                                <td colspan="6" class="p-4 text-center text-slate-400">No completed entries logged today.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
+            <!-- Farmer & Produce Details -->
+            <div class="details-list">
+              <div class="detail-row">
+                <span class="detail-label" data-i18n="farmerName">Farmer Name / ID</span>
+                <span class="detail-val" id="dispFarmerName">Ramesh Patil</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label" data-i18n="mandiCenter">Mandi Center</span>
+                <span class="detail-val" id="dispMandiCenter">Nashik Main APMC</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label" data-i18n="commodity">Commodity Type</span>
+                <span class="detail-val" id="dispCommodity">Onion</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label" data-i18n="quantity">Produce Quantity (Tons)</span>
+                <span class="detail-val" id="dispQuantity">5 Tons</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-label" data-i18n="vehicle">Vehicle Type</span>
+                <span class="detail-val" id="dispVehicle">Heavy Commercial Truck</span>
+              </div>
             </div>
-        </section>
 
-    </main>
+            <!-- Live Status Banner -->
+            <div class="status-grid">
+              <div class="stat-box">
+                <div class="stat-label" data-i18n="livePosition">Live Position</div>
+                <div class="stat-value text-green" id="dispPosition">#3</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label" data-i18n="dynamicEta">Dynamic ETA</div>
+                <div class="stat-value text-green" id="dispEta">10:45 AM</div>
+              </div>
+              <div class="stat-box">
+                <div class="stat-label" data-i18n="gracePeriod">Grace Period</div>
+                <div class="stat-value text-green" id="dispGrace">15 Minutes</div>
+              </div>
+            </div>
 
-    <!-- App Script -->
-    <script src="script.js"></script>
+            <!-- Bhashini TTS Audio Button -->
+            <button class="btn btn-audio btn-block" onclick="speakPassStatus()">
+              <i class="fa-solid fa-volume-high"></i> <span data-i18n="listenStatus">Listen to Status</span>
+            </button>
+          </div>
+
+        </div>
+
+        <!-- Right Side Box: Mandi Capacity Side Box (From Picture 9) -->
+        <div class="side-column">
+          <div class="card capacity-card">
+            <h3 class="card-title text-green-dark" data-i18n="checkCapacityTitle">
+              <i class="fa-solid fa-chart-pie"></i> <span data-i18n="checkCapacityHeader">Check Mandi Capacity</span>
+            </h3>
+            <p class="card-desc mb-15" data-i18n="capacitySub">Real-time daily limits and availability status</p>
+
+            <div class="alert-info-box mb-15">
+              <strong data-i18n="capacityStatusLabel">Capacity Status:</strong> 
+              <span id="capacityStatusText" data-i18n="capacityStatusDesc">Select Date, Mandi & Commodity to check availability.</span>
+            </div>
+
+            <div class="quota-box mb-15">
+              <label class="form-label" data-i18n="dailyQuota">Daily Quota Utilization</label>
+              <div class="progress-bg">
+                <div class="progress-bar" id="quotaProgressBar" style="width: 10%;"></div>
+              </div>
+              <div class="quota-text" id="quotaText">5 / 50 Tons Booked</div>
+            </div>
+
+            <!-- Simulated Mobile SMS Inbox Box -->
+            <div class="sms-inbox-box">
+              <h4 class="sms-inbox-title">
+                <i class="fa-solid fa-mobile-screen-button"></i> <span data-i18n="mobileInboxTitle">Mobile SMS Inbox (Simulation)</span>
+              </h4>
+              <p class="sms-inbox-body" id="farmerSmsInbox" data-i18n="noSmsYet">No SMS alerts received yet.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ==================== TAB 02: OFFICER DESK ==================== -->
+    <section id="sec-officer" class="tab-section">
+      <div class="section-badge">02</div>
+      <h2 class="section-title" data-i18n="officerTitle">Mandi Officer Control Desk</h2>
+      <p class="section-sub" data-i18n="officerSub">Verify passes and manage gate operations.</p>
+
+      <!-- Gate Pass Verification -->
+      <div class="card mb-20">
+        <div class="card-header">
+          <div class="badge-icon icon-amber"><i class="fa-solid fa-id-card"></i></div>
+          <div>
+            <h3 class="card-title" data-i18n="gateVerificationTitle">Gate Pass Verification</h3>
+            <p class="card-desc" data-i18n="gateVerificationDesc">Scan or enter token ID at the mandi entry gate.</p>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" data-i18n="tokenLabel">Token ID</label>
+          <input type="text" id="officerTokenInput" class="form-input" value="MND-68019">
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary btn-block" onclick="verifyToken()">
+            <span data-i18n="verifyEntryBtn">Verify Entry</span>
+          </button>
+          <button class="btn btn-outline btn-block" onclick="triggerCameraScan()">
+            <i class="fa-solid fa-camera"></i> <span data-i18n="openCameraBtn">Open Camera Scanner</span>
+          </button>
+        </div>
+
+        <!-- Verification Result Status Box -->
+        <div id="verificationResultBox" class="verification-alert hidden mt-15">
+          <i class="fa-solid fa-circle-check text-green"></i> 
+          <span id="verificationMsg">PASS VALID (MND-68019) — Gate entry permitted.</span>
+        </div>
+      </div>
+
+      <!-- Automated Weighbridge Station -->
+      <div class="card mb-20">
+        <div class="card-header">
+          <div class="badge-icon icon-blue"><i class="fa-solid fa-scale-balanced"></i></div>
+          <div>
+            <h3 class="card-title" data-i18n="weighbridgeTitle">Automated Weighbridge Station</h3>
+            <p class="card-desc" data-i18n="weighbridgeDesc">Simulate live weight scale input from the IoT sensor.</p>
+          </div>
+        </div>
+
+        <div class="weighbridge-display" id="weighDisplay">
+          --.--- TONS
+        </div>
+
+        <div class="btn-group">
+          <button class="btn btn-primary btn-block" onclick="captureWeight()">
+            <span data-i18n="captureWeightBtn">Capture Weight from Scale</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Entry & Process Action (Image 10) -->
+      <div class="card mb-20">
+        <h3 class="card-title mb-15" data-i18n="entryProcessTitle">2. Entry & Process Action</h3>
+        
+        <div class="process-summary-box mb-15">
+          <p><strong><span data-i18n="tokenLabel">Token ID</span>:</strong> <span id="procToken">#MND-68019</span></p>
+          <p><strong><span data-i18n="farmerName">Farmer Name</span>:</strong> <span id="procFarmer">Ramesh Patil</span></p>
+          <p><strong><span data-i18n="commodity">Commodity</span>:</strong> <span id="procCommodity">Onion</span></p>
+          <p><strong>Status Stage:</strong> <span class="badge-stage" id="procStage">WEIGHED</span></p>
+        </div>
+
+        <button class="btn btn-primary btn-block mb-10" onclick="approveGateEntry()">
+          <span data-i18n="approveGateBtn">Approve Gate Entry</span>
+        </button>
+
+        <div class="inline-weight-input mb-10">
+          <input type="number" id="manualWeightInput" class="form-input" value="5">
+          <button class="btn btn-blue" onclick="recordWeightManual()">
+            <span data-i18n="recordWeightBtn">Record Weight</span>
+          </button>
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="approveDbtPayment()">
+          <span data-i18n="approveDbtBtn">Approve & Release Payment (DBT)</span>
+        </button>
+      </div>
+
+      <!-- Queue Exceptions & Controls -->
+      <div class="card">
+        <div class="card-header">
+          <div class="badge-icon icon-red"><i class="fa-solid fa-traffic-light"></i></div>
+          <div>
+            <h3 class="card-title" data-i18n="queueExceptionsTitle">Queue Exceptions & Controls</h3>
+          </div>
+        </div>
+
+        <div class="btn-group-stacked mt-10">
+          <button class="btn btn-warning btn-block" onclick="grantBuffer()">
+            <span data-i18n="grantBufferBtn">Grant 15-min Buffer</span>
+          </button>
+          <button class="btn btn-danger btn-block" onclick="pauseEntry()">
+            <span data-i18n="pauseEntryBtn">Pause Gate Entry</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================== TAB 03: QUEUE ENGINE ==================== -->
+    <section id="sec-queue" class="tab-section">
+      <div class="section-badge">03</div>
+      <h2 class="section-title" data-i18n="queueEngineTitle">Queue Processing Engine</h2>
+      <p class="section-sub" data-i18n="queueEngineSub">Adjust capacity and monitor the current mandi workload.</p>
+
+      <!-- Capacity & Speed Adjuster -->
+      <div class="card mb-20">
+        <div class="card-header">
+          <div class="badge-icon icon-teal"><i class="fa-solid fa-sliders"></i></div>
+          <div>
+            <h3 class="card-title" data-i18n="adjusterTitle">Capacity & Speed Adjuster</h3>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" data-i18n="activeWeighbridges">Active Weighbridges</label>
+          <input type="number" id="weighbridgeCount" class="form-input" value="2" min="1" max="10" onchange="recalculateThroughput()">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" data-i18n="shiftEfficiency">Shift Efficiency Factor</label>
+          <select id="efficiencySelect" class="form-select" onchange="recalculateThroughput()">
+            <option value="10" selected data-i18n="normalSpeed">Normal Speed (100%)</option>
+            <option value="5" data-i18n="highSpeed">High Speed (150%)</option>
+            <option value="15" data-i18n="slowSpeed">Slow Speed (70%)</option>
+          </select>
+        </div>
+
+        <div class="alert-info-box">
+          <span data-i18n="calculatedThroughput">Calculated system throughput:</span> 
+          <strong id="throughputVal">10 minutes per vehicle</strong>
+        </div>
+      </div>
+
+      <!-- Active Mandi Status -->
+      <div class="card">
+        <div class="card-header">
+          <div class="badge-icon icon-teal"><i class="fa-solid fa-chart-column"></i></div>
+          <div>
+            <h3 class="card-title" data-i18n="activeMandiStatusTitle">Active Mandi Status</h3>
+          </div>
+        </div>
+
+        <div class="status-grid">
+          <div class="stat-box">
+            <div class="stat-label" data-i18n="inQueue">In Queue</div>
+            <div class="stat-value text-green" id="valInQueue">14</div>
+            <div class="stat-sublabel" data-i18n="vehicles">Vehicles</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label" data-i18n="averageWait">Average Wait</div>
+            <div class="stat-value text-green" id="valAvgWait">25</div>
+            <div class="stat-sublabel" data-i18n="minutes">Minutes</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-label" data-i18n="clearedToday">Cleared Today</div>
+            <div class="stat-value text-green" id="valClearedToday">82</div>
+            <div class="stat-sublabel" data-i18n="tons">Tons</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <!-- ==================== TAB 04: SMS LOGS ==================== -->
+    <section id="sec-sms" class="tab-section">
+      <div class="section-badge">04</div>
+      <h2 class="section-title" data-i18n="smsTitle">SMS Gateway & Broadcast Logs</h2>
+      <p class="section-sub" data-i18n="smsSub">View system and farmer communication events.</p>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="badge-icon icon-gray"><i class="fa-solid fa-comments"></i></div>
+          <div>
+            <h3 class="card-title" data-i18n="liveTelephonyLogs">Live Telephony Logs</h3>
+          </div>
+        </div>
+
+        <div class="terminal-logs-box" id="logsTerminal">
+          <!-- Dynamically Populated Logs -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- JavaScript File -->
+  <script src="script.js"></script>
 </body>
 </html>
