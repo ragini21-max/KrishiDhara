@@ -177,12 +177,11 @@ let otpTimer = null;
 let timerSeconds = 20;
 let isOtpSent = false;
 
-/* CAPACITY & QUEUE STATE */
+/* CAPACITY & QUEUE STATE (Strict Limit: 50 Tons Max) */
 const MAX_DAILY_QUOTA = 50; 
-let currentBookedQuota = 0;   
-let totalClearedTons = 0;     
+let currentBookedQuota = 0;   // Active reserved tons
+let totalClearedTons = 0;     // Approved & completed tons
 let activeVehiclesInQueue = 0;
-let hasActiveBooking = false; // Flag to track slot booking
 
 let currentFarmerData = null;
 
@@ -202,7 +201,7 @@ function switchTab(tabId) {
   document.getElementById(`sec-${tabId}`).classList.add('active');
 }
 
-/* Language Switch */
+/* Bhashini Dynamic Translation Handler */
 function changeLanguage(lang) {
   currentLang = lang;
   const t = translations[lang];
@@ -221,7 +220,7 @@ function changeLanguage(lang) {
   addLog(`Bhashini Language changed to: ${lang === 'hi' ? 'Hindi (हिन्दी)' : 'English'}`);
 }
 
-/* OTP Logic */
+/* Step 1: OTP Auth */
 function handleOtpClick() {
   const mobile = document.getElementById('mobileInput').value;
 
@@ -284,7 +283,7 @@ function resetOtpState() {
   document.getElementById('otpCodeInput').value = '';
 }
 
-/* Slot Booking - Triggers state change from "-" to active numbers */
+/* Step 2 & 3: Custom Pass Generation & Synchronized 50 Tons Quota Limit */
 function generateDigitalPass() {
   const name = document.getElementById('farmerNameInput').value.trim() || "Ramesh Patil";
   const mandi = document.getElementById('mandiSelect').value;
@@ -293,6 +292,7 @@ function generateDigitalPass() {
   const vehicle = document.getElementById('vehicleSelect').value;
   const baseSlot = document.getElementById('timeSlotSelect').value;
 
+  // STRICT CHECK: Cannot book if total quota (cleared + booked) exceeds 50 Tons
   if (currentBookedQuota + quantity > MAX_DAILY_QUOTA) {
     const remainingQuota = MAX_DAILY_QUOTA - currentBookedQuota;
     const alertMsg = currentLang === 'hi'
@@ -301,9 +301,6 @@ function generateDigitalPass() {
     alert(alertMsg);
     return;
   }
-
-  // Mark active booking flag as true
-  hasActiveBooking = true;
 
   // Update Capacity Tracker
   currentBookedQuota += quantity;
@@ -329,8 +326,10 @@ function generateDigitalPass() {
 
   updatePassUIDisplay();
 
+  // Dynamic QR Code Generation
   document.getElementById('qrImage').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${randomToken}`;
 
+  // Screen Transition
   document.getElementById('bookingFormCard').classList.add('hidden');
   document.getElementById('digitalPassCard').classList.remove('hidden');
 
@@ -341,7 +340,7 @@ function generateDigitalPass() {
   document.getElementById('procCommodity').textContent = commodity;
   document.getElementById('manualWeightInput').value = quantity;
 
-  // Update metrics in Queue Engine tab
+  // Sync metrics on Queue Engine Tab
   updateQueueEngineMetrics();
 
   addLog(`Pass Created: ${randomToken} - ${name} [${quantity} Tons ${commodity}]`);
@@ -360,15 +359,8 @@ function updatePassUIDisplay() {
   document.getElementById('dispPosition').textContent = currentFarmerData.position;
 }
 
-/* Synchronizer: Display "-" when no active booking exists */
+/* Dynamic Queue Engine Synchronizer */
 function updateQueueEngineMetrics() {
-  if (!hasActiveBooking) {
-    document.getElementById('valInQueue').textContent = "-";
-    document.getElementById('valAvgWait').textContent = "-";
-    document.getElementById('valClearedToday').textContent = "-";
-    return;
-  }
-
   const weighbridges = parseInt(document.getElementById('weighbridgeCount').value) || 2;
   const speed = parseInt(document.getElementById('efficiencySelect').value) || 10;
   
@@ -376,12 +368,14 @@ function updateQueueEngineMetrics() {
 
   document.getElementById('valInQueue').textContent = activeVehiclesInQueue;
   document.getElementById('valAvgWait').textContent = avgWaitMin;
+  
+  // Dynamic Cleared Today synced strictly with 50 Tons Limit
   document.getElementById('valClearedToday').textContent = `${totalClearedTons} / ${MAX_DAILY_QUOTA}`;
 }
 
 /* Machine Slowdown Simulation */
 function simulateMachineSlowdown() {
-  document.getElementById('efficiencySelect').value = "25";
+  document.getElementById('efficiencySelect').value = "25"; // Set Slow Speed
   recalculateThroughput();
 
   if (currentFarmerData) {
@@ -389,6 +383,7 @@ function simulateMachineSlowdown() {
     currentFarmerData.eta = newTime;
     document.getElementById('dispEta').textContent = newTime;
 
+    // Reveal Portal Banner Notice
     document.getElementById('portalDelayAlert').classList.remove('hidden');
 
     const smsText = currentLang === 'hi'
@@ -406,7 +401,7 @@ function simulateMachineSlowdown() {
   }
 }
 
-/* TTS Audio */
+/* Bhashini Text-To-Speech */
 function speakPassStatus() {
   if ('speechSynthesis' in window) {
     window.speechSynthesis.cancel();
@@ -431,7 +426,7 @@ function speakPassStatus() {
   }
 }
 
-/* Officer Actions */
+/* Officer Desk Actions & Real-Time Queue Clearance */
 function verifyToken() {
   const token = document.getElementById('officerTokenInput').value;
   const resultBox = document.getElementById('verificationResultBox');
@@ -476,6 +471,7 @@ function approveDbtPayment() {
   if (currentFarmerData && !currentFarmerData.completed) {
     currentFarmerData.completed = true;
     
+    // Clear vehicle from queue and add cleared tonnage
     totalClearedTons = Math.min(MAX_DAILY_QUOTA, totalClearedTons + currentFarmerData.quantity);
     activeVehiclesInQueue = Math.max(0, activeVehiclesInQueue - 1);
     
@@ -497,6 +493,7 @@ function pauseEntry() {
   addLog("Queue Exception: Gate Entry PAUSED.");
 }
 
+/* Queue Engine Capacity Throughput Calculations */
 function recalculateThroughput() {
   const count = parseInt(document.getElementById('weighbridgeCount').value) || 1;
   const efficiency = parseInt(document.getElementById('efficiencySelect').value) || 10;
@@ -510,6 +507,7 @@ function recalculateThroughput() {
   updateQueueEngineMetrics();
 }
 
+/* Telephony Terminal Logs */
 function addLog(message) {
   const logsContainer = document.getElementById('logsTerminal');
   if (!logsContainer) return;
