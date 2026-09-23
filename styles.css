@@ -1,3 +1,5 @@
+/* ==================== APMC MANDI SYSTEM STYLESHEET ==================== */
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -113,11 +115,16 @@ body {
   background-color: #ffffff;
   color: #14532d;
   font-weight: 700;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.nav-icon { font-size: 18px; }
-.nav-label { font-size: 0.75rem; }
+.nav-icon {
+  font-size: 18px;
+}
+
+.nav-label {
+  font-size: 0.75rem;
+}
 
 /* Layout & Containers */
 .container {
@@ -126,8 +133,13 @@ body {
   padding: 0 16px;
 }
 
-.tab-section { display: none; }
-.tab-section.active { display: block; }
+.tab-section {
+  display: none;
+}
+
+.tab-section.active {
+  display: block;
+}
 
 .section-badge {
   color: #16a34a;
@@ -203,10 +215,20 @@ body {
 .icon-teal { background-color: #ccfbf1; color: #0d9488; }
 .icon-gray { background-color: #f3f4f6; color: #4b5563; }
 
-.card-title { font-size: 1.1rem; color: #111827; font-weight: 700; }
-.card-desc { font-size: 0.85rem; color: #6b7280; }
+.card-title {
+  font-size: 1.1rem;
+  color: #111827;
+  font-weight: 700;
+}
 
-.form-group { margin-bottom: 16px; }
+.card-desc {
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
 
 .form-label {
   display: block;
@@ -231,7 +253,9 @@ body {
   border-right: 1px solid #d1d5db;
 }
 
-.input-phone input, .form-input, .form-select {
+.input-phone input,
+.form-input,
+.form-select {
   width: 100%;
   padding: 10px 14px;
   border: 1px solid #d1d5db;
@@ -240,7 +264,9 @@ body {
   outline: none;
 }
 
-.input-phone input { border: none; }
+.input-phone input {
+  border: none;
+}
 
 .otp-group {
   margin-top: 15px;
@@ -267,7 +293,10 @@ body {
   gap: 6px;
 }
 
-.timer-sec { font-size: 1rem; font-weight: 800; }
+.timer-sec {
+  font-size: 1rem;
+  font-weight: 800;
+}
 
 .btn {
   padding: 12px 20px;
@@ -283,8 +312,14 @@ body {
   gap: 8px;
 }
 
-.btn:hover { opacity: 0.9; }
-.btn-block { width: 100%; }
+.btn:hover {
+  opacity: 0.9;
+}
+
+.btn-block {
+  width: 100%;
+}
+
 .btn-primary { background-color: #14532d; color: #ffffff; }
 .btn-outline { background-color: #ffffff; color: #14532d; border: 1px solid #14532d; }
 .btn-audio { background-color: #4f46e5; color: #ffffff; }
@@ -292,11 +327,23 @@ body {
 .btn-warning { background-color: #d97706; color: #ffffff; }
 .btn-danger { background-color: #dc2626; color: #ffffff; }
 
-.btn-group { display: flex; gap: 10px; margin-top: 10px; }
-.btn-group-stacked { display: flex; flex-direction: column; gap: 10px; }
+.btn-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.btn-group-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
 /* Pass & QR Styles */
-.pass-card { border: 2px solid #22c55e; background-color: #fafdfb; }
+.pass-card {
+  border: 2px solid #22c55e;
+  background-color: #fafdfb;
+}
 
 .pass-header {
   display: flex;
@@ -305,8 +352,18 @@ body {
   margin-bottom: 16px;
 }
 
-.pass-tag { font-size: 0.7rem; font-weight: 800; color: #16a34a; letter-spacing: 1px; }
-.pass-title { font-size: 1.4rem; font-weight: 800; color: #064e3b; }
+.pass-tag {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #16a34a;
+  letter-spacing: 1px;
+}
+
+.pass-title {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: #064e3b;
+}
 
 .status-badge {
   background-color: #dcfce7;
@@ -326,9 +383,24 @@ body {
   margin-bottom: 16px;
 }
 
-.qr-img { width: 150px; height: 150px; margin: 0 auto; display: block; }
-.token-id { font-size: 1.2rem; font-weight: 800; color: #14532d; margin-top: 8px; }
-.qr-instruction { font-size: 0.8rem; color: #6b7280; }
+.qr-img {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  display: block;
+}
+
+.token-id {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #14532d;
+  margin-top: 8px;
+}
+
+.qr-instruction {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
 
 .details-list {
   background: #ffffff;
@@ -346,9 +418,18 @@ body {
   font-size: 0.88rem;
 }
 
-.detail-row:last-child { border-bottom: none; }
-.detail-label { color: #6b7280; }
-.detail-val { font-weight: 700; color: #111827; }
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: #6b7280;
+}
+
+.detail-val {
+  font-weight: 700;
+  color: #111827;
+}
 
 .status-grid {
   display: grid;
@@ -361,9 +442,23 @@ body {
   text-align: center;
 }
 
-.stat-label { font-size: 0.7rem; color: #4b5563; font-weight: 600; }
-.stat-value { font-size: 1.1rem; font-weight: 800; margin: 2px 0; }
-.stat-sublabel { font-size: 0.7rem; color: #6b7280; }
+.stat-label {
+  font-size: 0.7rem;
+  color: #4b5563;
+  font-weight: 600;
+}
+
+.stat-value {
+  font-size: 1.1rem;
+  font-weight: 800;
+  margin: 2px 0;
+}
+
+.stat-sublabel {
+  font-size: 0.7rem;
+  color: #6b7280;
+}
+
 .text-green { color: #15803d; }
 .text-green-dark { color: #14532d; }
 
@@ -410,7 +505,12 @@ body {
   transition: width 0.3s ease;
 }
 
-.quota-text { text-align: right; font-size: 0.85rem; font-weight: 800; color: #374151; }
+.quota-text {
+  text-align: right;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #374151;
+}
 
 .sms-inbox-box {
   background-color: #f0fdf4;
@@ -419,8 +519,18 @@ body {
   padding: 12px;
 }
 
-.sms-inbox-title { font-size: 0.85rem; color: #15803d; font-weight: 700; margin-bottom: 6px; }
-.sms-inbox-body { font-size: 0.8rem; color: #374151; font-style: italic; }
+.sms-inbox-title {
+  font-size: 0.85rem;
+  color: #15803d;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.sms-inbox-body {
+  font-size: 0.8rem;
+  color: #374151;
+  font-style: italic;
+}
 
 .verification-alert {
   background-color: #f0fdf4;
@@ -448,9 +558,27 @@ body {
   margin-bottom: 12px;
 }
 
-.process-summary-box { background-color: #f8fafc; padding: 12px; border-radius: 8px; font-size: 0.88rem; line-height: 1.6; }
-.badge-stage { background-color: #15803d; color: #ffffff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 700; }
-.inline-weight-input { display: flex; gap: 10px; }
+.process-summary-box {
+  background-color: #f8fafc;
+  padding: 12px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.badge-stage {
+  background-color: #15803d;
+  color: #ffffff;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.inline-weight-input {
+  display: flex;
+  gap: 10px;
+}
 
 .terminal-logs-box {
   background-color: #0f172a;
@@ -464,8 +592,12 @@ body {
   line-height: 1.8;
 }
 
-.log-entry { border-bottom: 1px solid #1e293b; padding: 4px 0; }
+.log-entry {
+  border-bottom: 1px solid #1e293b;
+  padding: 4px 0;
+}
 
+/* Utilities */
 .hidden { display: none !important; }
 .mb-10 { margin-bottom: 10px; }
 .mb-15 { margin-bottom: 15px; }
