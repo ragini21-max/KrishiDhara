@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <!-- Language Selector (Bhashini Engine: English / Hindi Only) -->
+      <!-- Language Selector (Bhashini Engine: English / Hindi) -->
       <div class="lang-selector-wrapper">
         <i class="fa-solid fa-language lang-icon"></i>
         <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
@@ -66,7 +66,7 @@
       <h2 class="section-title" data-i18n="farmerTitle">Farmer Portal & Digital Pass</h2>
       <p class="section-sub" data-i18n="farmerSub">Verify your mobile number and reserve a procurement slot.</p>
 
-      <!-- Machine Slowdown Portal Banner (Dynamically shown) -->
+      <!-- Machine Slowdown Portal Banner -->
       <div id="portalDelayAlert" class="alert-delay-banner hidden mb-20">
         <i class="fa-solid fa-triangle-exclamation"></i>
         <div>
@@ -177,7 +177,7 @@
             </button>
           </div>
 
-          <!-- STEP 3: Digital Gate Pass (Generated) -->
+          <!-- STEP 3: Digital Gate Pass -->
           <div class="card pass-card hidden" id="digitalPassCard">
             <div class="pass-header">
               <div>
@@ -220,11 +220,11 @@
             <div class="status-grid">
               <div class="stat-box">
                 <div class="stat-label" data-i18n="livePosition">Live Position</div>
-                <div class="stat-value text-green" id="dispPosition">#3</div>
+                <div class="stat-value text-green" id="dispPosition">#1</div>
               </div>
               <div class="stat-box">
                 <div class="stat-label" data-i18n="dynamicEta">Exact Arrival Time</div>
-                <div class="stat-value text-green" id="dispEta">10:45 AM</div>
+                <div class="stat-value text-green" id="dispEta">10:00 AM</div>
               </div>
               <div class="stat-box">
                 <div class="stat-label" data-i18n="gracePeriod">Grace Period</div>
@@ -292,7 +292,7 @@
 
         <div class="form-group">
           <label class="form-label" data-i18n="tokenLabel">Token ID</label>
-          <input type="text" id="officerTokenInput" class="form-input" value="MND-68019">
+          <input type="text" id="officerTokenInput" class="form-input" placeholder="Enter Token (e.g. MND-10001)">
         </div>
 
         <div class="btn-group">
@@ -332,10 +332,10 @@
         <h3 class="card-title mb-15" data-i18n="entryProcessTitle">2. Entry & Process Action</h3>
         
         <div class="process-summary-box mb-15">
-          <p><strong><span data-i18n="tokenLabel">Token ID</span>:</strong> <span id="procToken">#MND-68019</span></p>
-          <p><strong><span data-i18n="farmerName">Farmer Name</span>:</strong> <span id="procFarmer">Ramesh Patil</span></p>
-          <p><strong><span data-i18n="commodity">Commodity</span>:</strong> <span id="procCommodity">Onion</span></p>
-          <p><strong>Status Stage:</strong> <span class="badge-stage" id="procStage">WEIGHED</span></p>
+          <p><strong><span data-i18n="tokenLabel">Token ID</span>:</strong> <span id="procToken">No active booking</span></p>
+          <p><strong><span data-i18n="farmerName">Farmer Name</span>:</strong> <span id="procFarmer">-</span></p>
+          <p><strong><span data-i18n="commodity">Commodity</span>:</strong> <span id="procCommodity">-</span></p>
+          <p><strong>Status Stage:</strong> <span class="badge-stage" id="procStage">PENDING</span></p>
         </div>
 
         <button class="btn btn-primary btn-block mb-10" onclick="approveGateEntry()">
@@ -420,20 +420,21 @@
           </div>
         </div>
 
+        <!-- DYNAMIC CAPACITY-SYNCED METRICS -->
         <div class="status-grid">
           <div class="stat-box">
             <div class="stat-label" data-i18n="inQueue">In Queue</div>
-            <div class="stat-value text-green" id="valInQueue">14</div>
+            <div class="stat-value text-green" id="valInQueue">0</div>
             <div class="stat-sublabel" data-i18n="vehicles">Vehicles</div>
           </div>
           <div class="stat-box">
             <div class="stat-label" data-i18n="averageWait">Average Wait</div>
-            <div class="stat-value text-green" id="valAvgWait">25</div>
+            <div class="stat-value text-green" id="valAvgWait">0</div>
             <div class="stat-sublabel" data-i18n="minutes">Minutes</div>
           </div>
           <div class="stat-box">
             <div class="stat-label" data-i18n="clearedToday">Cleared Today</div>
-            <div class="stat-value text-green" id="valClearedToday">82</div>
+            <div class="stat-value text-green" id="valClearedToday">0 / 50</div>
             <div class="stat-sublabel" data-i18n="tons">Tons</div>
           </div>
         </div>
@@ -463,7 +464,7 @@
 
   <script src="script.js"></script>
 
-  <!-- PWA Offline Service Worker Registration -->
+  <!-- PWA Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
