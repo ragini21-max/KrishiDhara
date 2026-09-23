@@ -1,447 +1,384 @@
-// Application State Engine
-let appData = {
-    lang: 'en',
-    otpCode: null,
-    otpVerified: false,
-    otpTimerId: null,
-    delayMinutes: 0,
-    activeToken: null,
-    dailyCapacities: {
-        'Azadpur Mandi (Delhi)': { booked: 0, max: 50 },
-        'Vashi APMC (Mumbai)': { booked: 0, max: 50 },
-        'Lasalgaon Mandi (Nashik)': { booked: 0, max: 50 },
-        'Kalyan APMC (Maharashtra)': { booked: 0, max: 50 }
-    },
-    tokens: [],
-    html5QrScanner: null
-};
-
-// Multilingual Translations Engine
+/* ==================== INTERNATIONALIZATION (BHASHINI DICTIONARY) ==================== */
 const translations = {
-    en: {
-        otpTitle: "1. Farmer Mobile Authentication",
-        otpDesc: "Enter your mobile number to get a temporary demo verification OTP.",
-        bookingTitle: "2. Mandi Slot Booking",
-        farmerName: "Farmer Name",
-        mandiSelect: "Select Real Mandi Location",
-        quantity: "Produce Quantity (In Tons)",
-        slotTime: "Booking Slot Time (9 AM to 5 PM)",
-        submitBooking: "Confirm & Book Slot",
-        posText: "Queue Position",
-        etaText: "Exact Arrival Time",
-        summaryTitle: "Mandis Daily Operational Summary",
-        totalGoods: "Total Goods Collected",
-        totalMoney: "Total Money Disbursed",
-        speechMsg: (name, pos, time) => `Hello ${name}. Your booking is confirmed. Your queue position is ${pos}, and your arrival time is ${time}.`
-    },
-    hi: {
-        otpTitle: "1. किसान मोबाइल सत्यापन",
-        otpDesc: "डेमो सत्यापन ओटीपी प्राप्त करने के लिए अपना मोबाइल नंबर दर्ज करें।",
-        bookingTitle: "2. मंडी स्लोटी बुकिंग",
-        farmerName: "किसान का नाम",
-        mandiSelect: "मंडी का स्थान चुनें",
-        quantity: "उपज की मात्रा (टन में)",
-        slotTime: "बुकिंग समय (सुबह 9 से शाम 5 बजे)",
-        submitBooking: "बुक स्लॉट की पुष्टि करें",
-        posText: "कतार में स्थिति",
-        etaText: "पहुंचने का सटीक समय",
-        summaryTitle: "मंडी दैनिक परिचालन सारांश",
-        totalGoods: "कुल एकत्रित उपज",
-        totalMoney: "कुल वितरित राशि",
-        speechMsg: (name, pos, time) => `नमस्ते ${name}। आपकी बुकिंग पक्की हो गई है। कतार में आपका नंबर ${pos} है, और आपके पहुँचने का समय ${time} है।`
-    },
-    mr: {
-        otpTitle: "1. शेतकरी मोबाईल पडताळणी",
-        otpDesc: "डेमो पडताळणी ओटीपी मिळविण्यासाठी तुमचा मोबाईल नंबर प्रविष्ट करा.",
-        bookingTitle: "2. मंदी स्लॉट बुकिंग",
-        farmerName: "शेटकऱ्याचे नाव",
-        mandiSelect: "मंडीचे ठिकाण निवडा",
-        quantity: "मालाचे प्रमाण (टन मध्ये)",
-        slotTime: "बुकिंग वेळ (सकाळी 9 ते संध्याकाळी 5)",
-        submitBooking: "स्लॉट बुक निश्चित करा",
-        posText: "रांगेतील क्रमांक",
-        etaText: "पोहोचण्याची अचूक वेळ",
-        summaryTitle: "मंडी दैनिक कार्य अहवाल",
-        totalGoods: "एकूण जमा माल",
-        totalMoney: "एकूण वाटप केलेली रक्कम",
-        speechMsg: (name, pos, time) => `नमस्कार ${name}. तुमची बुकिंग निश्चित झाली आहे. रांगेत तुमचा क्रमांक ${pos} आहे, आणि तुमच्या पोहोचण्याची वेळ ${time} आहे.`
-    }
+  en: {
+    tabFarmer: "Farmer App",
+    tabOfficer: "Officer Desk",
+    tabQueue: "Queue Engine",
+    tabSms: "SMS Logs",
+    farmerTitle: "Farmer Portal & Digital Pass",
+    farmerSub: "Verify your mobile number and reserve a procurement slot.",
+    kisanOtpTitle: "Kisan OTP Authentication",
+    kisanOtpDesc: "Use your registered mobile number.",
+    mobileLabel: "Mobile Number",
+    enterOtpLabel: "Enter 6-Digit Demo OTP",
+    timeRemaining: "Time Remaining:",
+    sendOtp: "Send OTP",
+    verifyOtp: "Verify OTP & Generate Pass",
+    securePass: "SECURE PASS",
+    digitalPassTitle: "Digital Gate Pass",
+    slotConfirmed: "SLOT CONFIRMED",
+    showQrText: "Show this QR code at the entry gate.",
+    farmerName: "Farmer Name / ID",
+    mandiCenter: "Mandi Center",
+    commodity: "Commodity Type",
+    quantity: "Produce Quantity (Tons)",
+    vehicle: "Vehicle Type",
+    livePosition: "Live Position",
+    dynamicEta: "Dynamic ETA",
+    gracePeriod: "Grace Period",
+    listenStatus: "Listen to Status",
+    checkCapacityTitle: "Check Mandi Capacity",
+    checkCapacityHeader: "Check Mandi Capacity",
+    capacitySub: "Real-time daily limits and availability status",
+    capacityStatusLabel: "Capacity Status:",
+    capacityStatusDesc: "Select Date, Mandi & Commodity to check availability.",
+    dailyQuota: "Daily Quota Utilization",
+    mobileInboxTitle: "Mobile SMS Inbox (Simulation)",
+    noSmsYet: "No SMS alerts received yet.",
+    officerTitle: "Mandi Officer Control Desk",
+    officerSub: "Verify passes and manage gate operations.",
+    gateVerificationTitle: "Gate Pass Verification",
+    gateVerificationDesc: "Scan or enter token ID at the mandi entry gate.",
+    tokenLabel: "Token ID",
+    verifyEntryBtn: "Verify Entry",
+    openCameraBtn: "Open Camera Scanner",
+    weighbridgeTitle: "Automated Weighbridge Station",
+    weighbridgeDesc: "Simulate live weight scale input from the IoT sensor.",
+    captureWeightBtn: "Capture Weight from Scale",
+    entryProcessTitle: "2. Entry & Process Action",
+    approveGateBtn: "Approve Gate Entry",
+    recordWeightBtn: "Record Weight",
+    approveDbtBtn: "Approve & Release Payment (DBT)",
+    queueExceptionsTitle: "Queue Exceptions & Controls",
+    grantBufferBtn: "Grant 15-min Buffer",
+    pauseEntryBtn: "Pause Gate Entry",
+    queueEngineTitle: "Queue Processing Engine",
+    queueEngineSub: "Adjust capacity and monitor the current mandi workload.",
+    adjusterTitle: "Capacity & Speed Adjuster",
+    activeWeighbridges: "Active Weighbridges",
+    shiftEfficiency: "Shift Efficiency Factor",
+    normalSpeed: "Normal Speed (100%)",
+    highSpeed: "High Speed (150%)",
+    slowSpeed: "Slow Speed (70%)",
+    calculatedThroughput: "Calculated system throughput:",
+    activeMandiStatusTitle: "Active Mandi Status",
+    inQueue: "In Queue",
+    vehicles: "Vehicles",
+    averageWait: "Average Wait",
+    minutes: "Minutes",
+    clearedToday: "Cleared Today",
+    tons: "Tons",
+    smsTitle: "SMS Gateway & Broadcast Logs",
+    smsSub: "View system and farmer communication events.",
+    liveTelephonyLogs: "Live Telephony Logs"
+  },
+  hi: {
+    tabFarmer: "किसान ऐप",
+    tabOfficer: "अधिकारी डेस्क",
+    tabQueue: "कतार इंजन",
+    tabSms: "एसएमएस लॉग",
+    farmerTitle: "किसान पोर्टल और डिजिटल पास",
+    farmerSub: "अपना मोबाइल नंबर सत्यापित करें और स्लॉट आरक्षित करें।",
+    kisanOtpTitle: "किसान ओटीपी प्रमाणीकरण",
+    kisanOtpDesc: "अपने पंजीकृत मोबाइल नंबर का उपयोग करें।",
+    mobileLabel: "मोबाइल नंबर",
+    enterOtpLabel: "6-अंकीय डेमो ओटीपी दर्ज करें",
+    timeRemaining: "शेष समय:",
+    sendOtp: "ओटीपी भेजें",
+    verifyOtp: "ओटीपी सत्यापित करें और पास प्राप्त करें",
+    securePass: "सुरक्षित पास",
+    digitalPassTitle: "डिजिटल गेट पास",
+    slotConfirmed: "स्लॉट की पुष्टि हुई",
+    showQrText: "प्रवेश द्वार पर यह क्यूआर कोड दिखाएं।",
+    farmerName: "किसान का नाम / आईडी",
+    mandiCenter: "मंडी केंद्र",
+    commodity: "जिंस का प्रकार",
+    quantity: "उपज की मात्रा (टन)",
+    vehicle: "वाहन का प्रकार",
+    livePosition: "लाइव स्थिति",
+    dynamicEta: "अनुमानित समय (ETA)",
+    gracePeriod: "छूट की अवधि",
+    listenStatus: "स्थिति सुनें",
+    checkCapacityTitle: "मंडी क्षमता की जांच करें",
+    checkCapacityHeader: "मंडी क्षमता जांचें",
+    capacitySub: "वास्तविक समय की दैनिक सीमाएं और उपलब्धता की स्थिति",
+    capacityStatusLabel: "क्षमता स्थिति:",
+    capacityStatusDesc: "उपलब्धता की जांच के लिए तिथि, मंडी और जिंस का चयन करें।",
+    dailyQuota: "दैनिक कोटा उपयोग",
+    mobileInboxTitle: "मोबाइल एसएमएस इनबॉक्स (सिमुलेशन)",
+    noSmsYet: "अभी तक कोई एसएमएस प्राप्त नहीं हुआ है।",
+    officerTitle: "मंडी अधिकारी नियंत्रण डेस्क",
+    officerSub: "पास सत्यापित करें और गेट संचालन का प्रबंधन करें।",
+    gateVerificationTitle: "गेट पास सत्यापन",
+    gateVerificationDesc: "मंडी प्रवेश द्वार पर टोकन आईडी स्कैन या दर्ज करें।",
+    tokenLabel: "टोकन आईडी",
+    verifyEntryBtn: "प्रवेश सत्यापित करें",
+    openCameraBtn: "कैमरा स्कैनर खोलें",
+    weighbridgeTitle: "स्वचालित वेब्रिज स्टेशन",
+    weighbridgeDesc: "आईओटी सेंसर से लाइव वजन स्केल इनपुट का सिमुलेशन करें।",
+    captureWeightBtn: "स्केल से वजन कैप्चर करें",
+    entryProcessTitle: "2. प्रवेश और प्रक्रिया कार्रवाई",
+    approveGateBtn: "गेट प्रवेश स्वीकृत करें",
+    recordWeightBtn: "वजन दर्ज करें",
+    approveDbtBtn: "स्वीकृत करें और भुगतान जारी करें (DBT)",
+    queueExceptionsTitle: "कतार अपवाद और नियंत्रण",
+    grantBufferBtn: "15 मिनट की छूट दें",
+    pauseEntryBtn: "गेट प्रवेश रोकें",
+    queueEngineTitle: "कतार प्रसंस्करण इंजन",
+    queueEngineSub: "क्षमता को समायोजित करें और वर्तमान मंडी कार्यभार की निगरानी करें।",
+    adjusterTitle: "क्षमता और गति समायोजक",
+    activeWeighbridges: "सक्रिय धर्म कांटा (वेब्रिज)",
+    shiftEfficiency: "शिफ्ट दक्षता कारक",
+    normalSpeed: "सामान्य गति (100%)",
+    highSpeed: "उच्च गति (150%)",
+    slowSpeed: "धीमी गति (70%)",
+    calculatedThroughput: "गणना की गई प्रणाली की गति:",
+    activeMandiStatusTitle: "सक्रिय मंडी स्थिति",
+    inQueue: "कतार में",
+    vehicles: "वाहन",
+    averageWait: "औसत प्रतीक्षा",
+    minutes: "मिनट",
+    clearedToday: "आज पूर्ण किया गया",
+    tons: "टन",
+    smsTitle: "एसएमएस गेटवे और प्रसारण लॉग",
+    smsSub: "सिस्टम और किसान संचार की घटनाएं देखें।",
+    liveTelephonyLogs: "लाइव टेलीफोनी लॉग"
+  }
 };
 
-// Event Listeners Initialization
-document.addEventListener('DOMContentLoaded', () => {
-    // Navigation Tabs
-    document.getElementById('tab-farmer')?.addEventListener('click', () => switchTab('farmer'));
-    document.getElementById('tab-officer')?.addEventListener('click', () => switchTab('officer'));
-    document.getElementById('tab-summary')?.addEventListener('click', () => switchTab('summary'));
+/* State Variables */
+let currentLang = 'en';
+let generatedOtp = '';
+let otpTimer = null;
+let timerSeconds = 20;
+let isOtpSent = false;
 
-    // Language Change
-    document.getElementById('langSelect')?.addEventListener('change', (e) => changeLanguage(e.target.value));
-
-    // OTP Functionality
-    document.getElementById('btn-gen-otp')?.addEventListener('click', generateOTP);
-    document.getElementById('btn-verify-otp')?.addEventListener('click', verifyOTP);
-
-    // Mandi Capacity Tracker
-    document.getElementById('mandiSelect')?.addEventListener('change', updateMandiCapacityUI);
-
-    // Form Booking
-    document.getElementById('bookingForm')?.addEventListener('submit', handleBooking);
-
-    // Audio Playback
-    document.getElementById('btn-replay-audio')?.addEventListener('click', playAudioAnnouncement);
-
-    // Officer Controls
-    document.getElementById('btn-start-cam')?.addEventListener('click', startQRScanner);
-    document.getElementById('btn-stop-cam')?.addEventListener('click', stopQRScanner);
-    document.getElementById('btn-fetch-manual')?.addEventListener('click', loadManualToken);
-    document.getElementById('btn-complete-pay')?.addEventListener('click', completeEntryAndPay);
-
-    // Vehicle Speed Adjustment Buttons
-    document.getElementById('btn-speed-slow')?.addEventListener('click', () => adjustVehicleSpeed('slow'));
-    document.getElementById('btn-speed-normal')?.addEventListener('click', () => adjustVehicleSpeed('normal'));
-
-    // Register Service Worker for Offline Functionality
-    registerServiceWorker();
+/* Initialize System on Page Load */
+window.addEventListener('DOMContentLoaded', () => {
+  addLog("System: Mandi Queue Engine initialized.");
+  addLog("Bhashini Language Engine activated (EN/HI).");
 });
 
-// Navigation Switcher Logic
-function switchTab(tab) {
-    document.querySelectorAll('main > section').forEach(el => el.classList.add('hidden'));
-    document.querySelectorAll('nav button').forEach(el => {
-        el.classList.remove('font-semibold', 'text-green-800', 'border-b-2', 'border-green-700');
-        el.classList.add('text-slate-600');
-    });
-    
-    document.getElementById(`sec-${tab}`)?.classList.remove('hidden');
-    const activeBtn = document.getElementById(`tab-${tab}`);
-    if (activeBtn) {
-        activeBtn.classList.add('font-semibold', 'text-green-800', 'border-b-2', 'border-green-700');
-        activeBtn.classList.remove('text-slate-600');
-    }
+/* Tab Switching Function */
+function switchTab(tabId) {
+  document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+  document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+
+  document.getElementById(`tab-${tabId}`).classList.add('active');
+  document.getElementById(`sec-${tabId}`).classList.add('active');
 }
 
-// Multilingual Translation Update Logic
-function changeLanguage(langKey) {
-    appData.lang = langKey;
-    const t = translations[langKey];
+/* Bhashini Dynamic Language Change */
+function changeLanguage(lang) {
+  currentLang = lang;
+  const t = translations[lang];
 
-    if (document.getElementById('lbl-otp-title')) document.getElementById('lbl-otp-title').innerText = t.otpTitle;
-    if (document.getElementById('lbl-otp-desc')) document.getElementById('lbl-otp-desc').innerText = t.otpDesc;
-    if (document.getElementById('lbl-booking-title')) document.getElementById('lbl-booking-title').innerText = t.bookingTitle;
-    if (document.getElementById('lbl-farmer-name')) document.getElementById('lbl-farmer-name').innerText = t.farmerName;
-    if (document.getElementById('lbl-mandi-select')) document.getElementById('lbl-mandi-select').innerText = t.mandiSelect;
-    if (document.getElementById('lbl-quantity')) document.getElementById('lbl-quantity').innerText = t.quantity;
-    if (document.getElementById('lbl-slot-time')) document.getElementById('lbl-slot-time').innerText = t.slotTime;
-    if (document.getElementById('btn-submit-booking')) document.getElementById('btn-submit-booking').innerText = t.submitBooking;
-    if (document.getElementById('lbl-pos-text')) document.getElementById('lbl-pos-text').innerText = t.posText;
-    if (document.getElementById('lbl-eta-text')) document.getElementById('lbl-eta-text').innerText = t.etaText;
-    if (document.getElementById('lbl-summary-title')) document.getElementById('lbl-summary-title').innerText = t.summaryTitle;
-    if (document.getElementById('lbl-total-goods')) document.getElementById('lbl-total-goods').innerText = t.totalGoods;
-    if (document.getElementById('lbl-total-money')) document.getElementById('lbl-total-money').innerText = t.totalMoney;
-
-    if (appData.activeToken) {
-        playAudioAnnouncement();
+  document.querySelectorAll('[data-i18n]').forEach(elem => {
+    const key = elem.getAttribute('data-i18n');
+    if (t[key]) {
+      elem.textContent = t[key];
     }
+  });
+
+  // Dynamic values update
+  if (currentLang === 'hi') {
+    document.getElementById('dispFarmerName').textContent = "रमेश पाटिल";
+    document.getElementById('dispMandiCenter').textContent = "नासिक मुख्य एपीएमसी";
+    document.getElementById('dispCommodity').textContent = "प्याज";
+    document.getElementById('dispQuantity').textContent = "5 टन";
+    document.getElementById('dispVehicle').textContent = "भारी वाणिज्‍यिक ट्रक";
+    document.getElementById('dispGrace').textContent = "15 मिनट";
+  } else {
+    document.getElementById('dispFarmerName').textContent = "Ramesh Patil";
+    document.getElementById('dispMandiCenter').textContent = "Nashik Main APMC";
+    document.getElementById('dispCommodity').textContent = "Onion";
+    document.getElementById('dispQuantity').textContent = "5 Tons";
+    document.getElementById('dispVehicle').textContent = "Heavy Commercial Truck";
+    document.getElementById('dispGrace').textContent = "15 Minutes";
+  }
+
+  addLog(`Bhashini Language changed to: ${lang === 'hi' ? 'Hindi (हिन्दी)' : 'English'}`);
 }
 
-// Demo OTP & 20-Second Countdown
-function generateOTP() {
-    const mobile = document.getElementById('mobileNo').value;
+/* OTP Flow Handler with 20-Second Countdown Timer */
+function handleOtpClick() {
+  const mobile = document.getElementById('mobileInput').value;
+
+  if (!isOtpSent) {
     if (!mobile || mobile.length < 10) {
-        alert("Please enter a valid 10-digit mobile number.");
-        return;
+      alert(currentLang === 'hi' ? "कृपया 10-अंकीय वैध मोबाइल नंबर दर्ज करें।" : "Please enter a valid 10-digit mobile number.");
+      return;
     }
 
-    appData.otpCode = Math.floor(1000 + Math.random() * 9000).toString();
-    document.getElementById('demoOtpVal').innerText = appData.otpCode;
-    document.getElementById('otpBox').classList.remove('hidden');
+    // Generate random 6-digit OTP
+    generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    isOtpSent = true;
 
-    let timeLeft = 20;
-    document.getElementById('otpTimer').innerText = timeLeft;
-    clearInterval(appData.otpTimerId);
+    // Show OTP input and timer
+    document.getElementById('otpInputGroup').classList.remove('hidden');
+    document.getElementById('otpBtnText').textContent = translations[currentLang].verifyOtp;
 
-    appData.otpTimerId = setInterval(() => {
-        timeLeft--;
-        document.getElementById('otpTimer').innerText = timeLeft;
+    // Alert user with demo OTP
+    alert(`${currentLang === 'hi' ? 'आपका डेमो ओटीपी है' : 'Your Demo OTP is'}: ${generatedOtp}`);
 
-        if (timeLeft <= 0) {
-            clearInterval(appData.otpTimerId);
-            appData.otpCode = null;
-            alert("OTP Expired! Please generate a new OTP.");
-            document.getElementById('otpBox').classList.add('hidden');
-        }
+    // Update Mobile Inbox Simulation (Side Box)
+    const smsMsg = currentLang === 'hi' 
+      ? `आपका एपीएमसी ओटीपी ${generatedOtp} है। यह 20 सेकंड के लिए मान्य है।`
+      : `Your APMC Demo OTP is ${generatedOtp}. Valid for 20 seconds.`;
+    document.getElementById('farmerSmsInbox').textContent = smsMsg;
+
+    addLog(`Demo OTP sent successfully. +91-${mobile} [OTP: ${generatedOtp}]`);
+
+    // Start 20-second timer
+    timerSeconds = 20;
+    document.getElementById('timerVal').textContent = timerSeconds;
+
+    clearInterval(otpTimer);
+    otpTimer = setInterval(() => {
+      timerSeconds--;
+      document.getElementById('timerVal').textContent = timerSeconds;
+
+      if (timerSeconds <= 0) {
+        clearInterval(otpTimer);
+        alert(currentLang === 'hi' ? "ओटीपी समाप्त हो गया है! कृपया पुन: प्रयास करें।" : "OTP Expired! Please try again.");
+        resetOtpState();
+      }
     }, 1000);
-}
 
-function verifyOTP() {
-    const userEntered = document.getElementById('otpInput').value;
-    if (userEntered === appData.otpCode) {
-        clearInterval(appData.otpTimerId);
-        appData.otpVerified = true;
-        alert("OTP Verified Successfully!");
-        document.getElementById('otpBox').classList.add('hidden');
-        
-        const card = document.getElementById('booking-card');
-        card.classList.remove('opacity-50', 'pointer-events-none');
+  } else {
+    // Verify OTP
+    const enteredOtp = document.getElementById('otpCodeInput').value;
+    if (enteredOtp === generatedOtp) {
+      clearInterval(otpTimer);
+      alert(currentLang === 'hi' ? "सत्यापन सफल! आपका गेट पास तैयार है।" : "Authentication successful! Your gate pass is generated.");
+
+      document.getElementById('otpCard').classList.add('hidden');
+      document.getElementById('digitalPassCard').classList.remove('hidden');
+
+      // Update quota box
+      document.getElementById('quotaProgressBar').style.width = "20%";
+      document.getElementById('quotaText').textContent = "5 / 50 Tons Booked";
+
+      addLog("Farmer authenticated successfully.");
+      addLog("Booking confirmed. Your digital pass is ready. #MND-68019 — Ramesh Patil");
     } else {
-        alert("Invalid OTP! Please check and try again.");
+      alert(currentLang === 'hi' ? "गलत ओटीपी! कृपया पुन: प्रयास करें।" : "Invalid OTP! Please check and try again.");
     }
+  }
 }
 
-// Mandi Capacity Tracker
-function updateMandiCapacityUI() {
-    const selectedMandi = document.getElementById('mandiSelect').value;
-    const cap = appData.dailyCapacities[selectedMandi];
-    const statusElem = document.getElementById('capacityStatus');
-    statusElem.innerText = `Booked: ${cap.booked} / ${cap.max} Tons`;
-    if (cap.booked >= cap.max) {
-        statusElem.className = "font-bold text-red-600";
+function resetOtpState() {
+  isOtpSent = false;
+  document.getElementById('otpInputGroup').classList.add('hidden');
+  document.getElementById('otpBtnText').textContent = translations[currentLang].sendOtp;
+  document.getElementById('otpCodeInput').value = '';
+}
+
+/* Bhashini Text-To-Speech Narration */
+function speakPassStatus() {
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel(); // Stop any active speech
+
+    let textToSpeak = "";
+    if (currentLang === 'hi') {
+      textToSpeak = "नमस्ते रमेश पाटिल। आपका डिजिटल पास MND-68019 नासिक मुख्य एपीएमसी के लिए पुष्टि किया गया है। आपकी उपज 5 टन प्याज है। आपकी वर्तमान कतार स्थिति नंबर 3 है, और अनुमानित समय सुबह 10 बजकर 45 मिनट है।";
     } else {
-        statusElem.className = "font-bold text-green-700";
+      textToSpeak = "Hello Ramesh Patil. Your Digital Gate Pass MND-68019 is confirmed for Nashik Main APMC. Produce: 5 Tons of Onion. Your current live position is #3, and estimated arrival time is 10:45 AM.";
     }
+
+    const utterance = new SpeechSynthesisUtterance(textToSpeak);
+    utterance.lang = currentLang === 'hi' ? 'hi-IN' : 'en-US';
+    utterance.rate = 0.9; // Natural speed
+
+    window.speechSynthesis.speak(utterance);
+    addLog(`Bhashini TTS Narration triggered [${currentLang.toUpperCase()}]`);
+  } else {
+    alert("Text-to-speech is not supported in your browser.");
+  }
 }
 
-// Slot Booking Processor
-function handleBooking(event) {
-    event.preventDefault();
-    
-    const name = document.getElementById('farmerName').value;
-    const mandi = document.getElementById('mandiSelect').value;
-    const weight = parseFloat(document.getElementById('produceWeight').value);
-    const slotTime = document.getElementById('slotTime').value;
+/* Officer Desk Actions */
+function verifyToken() {
+  const token = document.getElementById('officerTokenInput').value;
+  const resultBox = document.getElementById('verificationResultBox');
+  resultBox.classList.remove('hidden');
 
-    const cap = appData.dailyCapacities[mandi];
-
-    // Capacity Limit Enforcement (50 Tons)
-    if (cap.booked + weight > cap.max) {
-        alert(`Booking Rejected! Selected Mandi capacity full. Remaining allowance: ${cap.max - cap.booked} Tons.`);
-        return;
-    }
-
-    cap.booked += weight;
-    updateMandiCapacityUI();
-
-    const queuePos = appData.tokens.filter(t => t.mandi === mandi).length + 1;
-    const tokenId = "TKN-" + (100 + appData.tokens.length + 1);
-    const exactArrivalTime = calculateArrivalETA(slotTime, queuePos, appData.delayMinutes);
-
-    const tokenObj = {
-        id: tokenId,
-        farmer: name,
-        mandi: mandi,
-        weight: weight,
-        slotTime: slotTime,
-        position: queuePos,
-        arrivalTime: exactArrivalTime,
-        actualWeight: 0,
-        disbursedMoney: 0,
-        status: 'Booked'
-    };
-
-    appData.tokens.push(tokenObj);
-    appData.activeToken = tokenObj;
-
-    document.getElementById('ticket-token-id').innerText = tokenObj.id;
-    document.getElementById('ticket-queue-pos').innerText = `#${tokenObj.position} in Line`;
-    document.getElementById('ticket-arrival-time').innerText = tokenObj.arrivalTime;
-    document.getElementById('ticket-mandi').innerText = tokenObj.mandi;
-    document.getElementById('ticket-weight').innerText = `${tokenObj.weight} Tons`;
-    document.getElementById('ticket-card').classList.remove('hidden');
-
-    // QR Code Generation
-    document.getElementById('qrcode').innerHTML = "";
-    if (typeof QRCode !== 'undefined') {
-        new QRCode(document.getElementById("qrcode"), {
-            text: JSON.stringify({ id: tokenObj.id, farmer: tokenObj.farmer, mandi: tokenObj.mandi }),
-            width: 128,
-            height: 128
-        });
-    }
-
-    playAudioAnnouncement();
+  if (token === "MND-68019") {
+    const msg = currentLang === 'hi' 
+      ? `पास मान्य है (MND-68019) — गेट प्रवेश की अनुमति दी गई।`
+      : `PASS VALID (MND-68019) — Gate entry permitted.`;
+    document.getElementById('verificationMsg').textContent = msg;
+    addLog(`Officer Desk: Token ${token} verified successfully.`);
+  } else {
+    document.getElementById('verificationMsg').textContent = `TOKEN INVALID OR EXPIRED (${token})`;
+  }
 }
 
-// Calculate ETA Time
-function calculateArrivalETA(baseTimeStr, queuePos, extraDelay) {
-    let [time, modifier] = baseTimeStr.split(' ');
-    let [hours, minutes] = time.split(':').map(Number);
-
-    if (modifier === 'PM' && hours < 12) hours += 12;
-    if (modifier === 'AM' && hours === 12) hours = 0;
-
-    let date = new Date();
-    date.setHours(hours);
-    date.setMinutes(minutes + ((queuePos - 1) * 15) + extraDelay);
-
-    let newHours = date.getHours();
-    let newMinutes = date.getMinutes();
-    let newMod = newHours >= 12 ? 'PM' : 'AM';
-    newHours = newHours % 12 || 12;
-
-    return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')} ${newMod}`;
+function triggerCameraScan() {
+  alert(currentLang === 'hi' ? "कैमरा स्कैनर सक्रिय किया गया। क्यूआर कोड की स्कैनिंग का अनुकरण..." : "Camera scanner activated. Simulating QR Code scan...");
+  document.getElementById('officerTokenInput').value = "MND-68019";
+  verifyToken();
 }
 
-// Text-To-Speech Audio Output
-function playAudioAnnouncement() {
-    if (!appData.activeToken) return;
-    const t = translations[appData.lang];
-    const text = t.speechMsg(appData.activeToken.farmer, appData.activeToken.position, appData.activeToken.arrivalTime);
-
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel();
-        const utterance = new SpeechSynthesisUtterance(text);
-        
-        if (appData.lang === 'hi') utterance.lang = 'hi-IN';
-        else if (appData.lang === 'mr') utterance.lang = 'mr-IN';
-        else utterance.lang = 'en-US';
-
-        window.speechSynthesis.speak(utterance);
-    }
+function captureWeight() {
+  const simulatedWeight = (4.8 + Math.random() * 0.4).toFixed(3);
+  document.getElementById('weighDisplay').textContent = `${simulatedWeight} TONS`;
+  document.getElementById('manualWeightInput').value = Math.round(simulatedWeight);
+  addLog(`Weighbridge IoT Sensor: Captured weight ${simulatedWeight} Tons.`);
 }
 
-// Officer QR Scanner & Manual Fetch
-function startQRScanner() {
-    if (typeof Html5QrcodeScanner === 'undefined') {
-        alert("QR Scanner library not loaded.");
-        return;
-    }
-    
-    if (appData.html5QrScanner) {
-        stopQRScanner();
-    }
-
-    appData.html5QrScanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
-    appData.html5QrScanner.render((decodedText) => {
-        try {
-            const parsed = JSON.parse(decodedText);
-            loadTokenData(parsed.id);
-            stopQRScanner();
-        } catch(e) {
-            loadTokenData(decodedText);
-            stopQRScanner();
-        }
-    }, (error) => {});
+function approveGateEntry() {
+  alert(currentLang === 'hi' ? "गेट प्रवेश स्वीकृत किया गया!" : "Gate Entry Approved!");
+  document.getElementById('procStage').textContent = "GATE ENTERED";
+  addLog("Officer Action: Gate Entry Approved for #MND-68019.");
 }
 
-function stopQRScanner() {
-    if (appData.html5QrScanner) {
-        appData.html5QrScanner.clear().catch(err => console.error("Error clearing scanner", err));
-        appData.html5QrScanner = null;
-    }
+function recordWeightManual() {
+  const weight = document.getElementById('manualWeightInput').value;
+  alert(`${currentLang === 'hi' ? 'वजन दर्ज किया गया' : 'Weight Recorded'}: ${weight} Tons`);
+  document.getElementById('procStage').textContent = "WEIGHED";
+  addLog(`Officer Action: Weight recorded manually as ${weight} Tons.`);
 }
 
-function loadManualToken() {
-    const input = document.getElementById('manualTokenInput').value.trim();
-    loadTokenData(input);
+function approveDbtPayment() {
+  alert(currentLang === 'hi' ? "डीबीटी भुगतान जारी किया गया!" : "DBT Payment Released successfully!");
+  document.getElementById('procStage').textContent = "COMPLETED & PAID";
+  addLog("Officer Action: DBT Direct Payment released to Ramesh Patil.");
 }
 
-function loadTokenData(tokenId) {
-    const token = appData.tokens.find(t => t.id.toLowerCase() === tokenId.toLowerCase());
-    if (!token) {
-        alert("Token not found!");
-        return;
-    }
-
-    document.getElementById('officer-token-id').innerText = token.id;
-    document.getElementById('officer-farmer-name').innerText = token.farmer;
-    document.getElementById('actualWeight').value = token.weight;
-    document.getElementById('weighbridgeForm').classList.remove('hidden');
+function grantBuffer() {
+  alert(currentLang === 'hi' ? "15 मिनट की अतिरिक्त छूट दी गई।" : "15-Minute Grace Buffer Granted.");
+  addLog("Queue Exception: 15-min Buffer granted to Token #MND-68019.");
 }
 
-function completeEntryAndPay() {
-    const tokenId = document.getElementById('officer-token-id').innerText;
-    const token = appData.tokens.find(t => t.id === tokenId);
-    
-    if (!token) return;
-
-    const actualW = parseFloat(document.getElementById('actualWeight').value);
-    const msp = parseFloat(document.getElementById('mspRate').value);
-
-    token.actualWeight = actualW;
-    token.disbursedMoney = actualW * msp;
-    token.status = "Completed";
-
-    alert(`Processing Complete!\nActual Weight: ${actualW} Tons\nTotal Disbursed: ₹ ${token.disbursedMoney.toLocaleString('en-IN')}`);
-
-    document.getElementById('weighbridgeForm').classList.add('hidden');
-    updateSummaryDashboard();
+function pauseEntry() {
+  alert(currentLang === 'hi' ? "गेट प्रवेश रोक दिया गया है!" : "Gate Entry Paused!");
+  addLog("Queue Exception: Gate Entry PAUSED by Mandi Officer.");
 }
 
-// Throttle Control & Dynamic ETA Recalculation
-function adjustVehicleSpeed(mode) {
-    if (mode === 'slow') {
-        appData.delayMinutes += 15;
-    } else {
-        appData.delayMinutes = 0;
-    }
+/* Queue Engine Logic */
+function recalculateThroughput() {
+  const count = parseInt(document.getElementById('weighbridgeCount').value) || 1;
+  const efficiency = parseInt(document.getElementById('efficiencySelect').value) || 10;
+  const throughput = Math.max(2, Math.round(efficiency / count));
 
-    appData.tokens.forEach(t => {
-        if (t.status === 'Booked') {
-            t.arrivalTime = calculateArrivalETA(t.slotTime, t.position, appData.delayMinutes);
-        }
-    });
-
-    if (appData.activeToken) {
-        document.getElementById('ticket-arrival-time').innerText = appData.activeToken.arrivalTime;
-        
-        const smsText = `SMS Alert: Traffic/Weighbridge delay experienced at ${appData.activeToken.mandi}. Your updated estimated arrival time is ${appData.activeToken.arrivalTime}.`;
-        document.getElementById('smsAlertText').innerText = smsText;
-        document.getElementById('smsAlertBox').classList.remove('hidden');
-    }
-
-    alert(mode === 'slow' ? "Processing slowed down! Dynamic delay applied & SMS notifications sent." : "Normal intake speed restored.");
+  const text = currentLang === 'hi' 
+    ? `${throughput} मिनट प्रति वाहन` 
+    : `${throughput} minutes per vehicle`;
+  document.getElementById('throughputVal').textContent = text;
 }
 
-// Summary Dashboard Updates
-function updateSummaryDashboard() {
-    let totalGoods = 0;
-    let totalMoney = 0;
+/* Centralized Telephony Logger */
+function addLog(message) {
+  const logsContainer = document.getElementById('logsTerminal');
+  if (!logsContainer) return;
 
-    const tbody = document.getElementById('summaryTableBody');
-    tbody.innerHTML = "";
+  const now = new Date();
+  const timeStr = now.toTimeString().split(' ')[0].substring(0, 5);
 
-    const completedTokens = appData.tokens.filter(t => t.status === "Completed");
+  const logRow = document.createElement('div');
+  logRow.className = 'log-entry';
+  logRow.textContent = `[${timeStr}] ${message}`;
 
-    if (completedTokens.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-4 text-center text-slate-400">No completed entries logged today.</td></tr>`;
-    } else {
-        completedTokens.forEach(t => {
-            totalGoods += t.actualWeight;
-            totalMoney += t.disbursedMoney;
-
-            const tr = document.createElement('tr');
-            tr.className = "border-b text-slate-700 hover:bg-slate-50";
-            tr.innerHTML = `
-                <td class="p-3 font-bold">${t.id}</td>
-                <td class="p-3">${t.farmer}</td>
-                <td class="p-3">${t.mandi}</td>
-                <td class="p-3 font-semibold">${t.actualWeight} Tons</td>
-                <td class="p-3 text-emerald-700 font-bold">₹ ${t.disbursedMoney.toLocaleString('en-IN')}</td>
-                <td class="p-3"><span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full font-bold">Completed</span></td>
-            `;
-            tbody.appendChild(tr);
-        });
-    }
-
-    document.getElementById('sumTotalGoods').innerText = `${totalGoods.toFixed(1)} Tons`;
-    document.getElementById('sumTotalMoney').innerText = `₹ ${totalMoney.toLocaleString('en-IN')}`;
-}
-
-// Service Worker Registration for Offline Capability
-function registerServiceWorker() {
-    if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
-        const swCode = `
-            const CACHE_NAME = 'mandi-cache-v1';
-            self.addEventListener('install', e => {
-                e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(['./'])));
-            });
-            self.addEventListener('fetch', e => {
-                e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
-            });
-        `;
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl).catch(() => {});
-    }
+  logsContainer.prepend(logRow);
 }
