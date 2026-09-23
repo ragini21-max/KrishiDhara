@@ -8,8 +8,8 @@
   <meta name="theme-color" content="#14532d">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Stylesheet -->
-  <link rel="stylesheet" href="styles.css">
+  <!-- CSS External File -->
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
         </div>
       </div>
 
-      <!-- Language Selector (Bhashini Engine: English / Hindi) -->
+      <!-- Language Selector -->
       <div class="lang-selector-wrapper">
         <i class="fa-solid fa-language lang-icon"></i>
         <select id="langSelect" class="lang-select" onchange="changeLanguage(this.value)">
@@ -114,7 +114,7 @@
             </button>
           </div>
 
-          <!-- STEP 2: Farmer & Produce Details Booking Form -->
+          <!-- STEP 2: Booking Form -->
           <div class="card hidden" id="bookingFormCard">
             <div class="card-header">
               <div class="badge-num">2</div>
@@ -189,7 +189,7 @@
 
             <div class="qr-box">
               <img id="qrImage" src="" alt="Pass QR Code" class="qr-img">
-              <div class="token-id" id="passTokenDisplay">#MND-68019</div>
+              <div class="token-id" id="passTokenDisplay">#MND------</div>
               <p class="qr-instruction" data-i18n="showQrText">Show this QR code at the entry gate.</p>
             </div>
 
@@ -220,11 +220,11 @@
             <div class="status-grid">
               <div class="stat-box">
                 <div class="stat-label" data-i18n="livePosition">Live Position</div>
-                <div class="stat-value text-green" id="dispPosition">#1</div>
+                <div class="stat-value text-green" id="dispPosition">-</div>
               </div>
               <div class="stat-box">
                 <div class="stat-label" data-i18n="dynamicEta">Exact Arrival Time</div>
-                <div class="stat-value text-green" id="dispEta">10:00 AM</div>
+                <div class="stat-value text-green" id="dispEta">-</div>
               </div>
               <div class="stat-box">
                 <div class="stat-label" data-i18n="gracePeriod">Grace Period</div>
@@ -258,7 +258,7 @@
               <div class="progress-bg">
                 <div class="progress-bar" id="quotaProgressBar" style="width: 0%;"></div>
               </div>
-              <div class="quota-text" id="quotaText">0 / 50 Tons Booked</div>
+              <div class="quota-text" id="quotaText">- / 50 Tons Booked</div>
             </div>
 
             <!-- Mobile SMS Inbox Simulation -->
@@ -420,21 +420,21 @@
           </div>
         </div>
 
-        <!-- DYNAMIC CAPACITY-SYNCED METRICS -->
+        <!-- DYNAMIC DASHED STATUS METRICS -->
         <div class="status-grid">
           <div class="stat-box">
             <div class="stat-label" data-i18n="inQueue">In Queue</div>
-            <div class="stat-value text-green" id="valInQueue">0</div>
+            <div class="stat-value text-green" id="valInQueue">-</div>
             <div class="stat-sublabel" data-i18n="vehicles">Vehicles</div>
           </div>
           <div class="stat-box">
             <div class="stat-label" data-i18n="averageWait">Average Wait</div>
-            <div class="stat-value text-green" id="valAvgWait">0</div>
+            <div class="stat-value text-green" id="valAvgWait">-</div>
             <div class="stat-sublabel" data-i18n="minutes">Minutes</div>
           </div>
           <div class="stat-box">
             <div class="stat-label" data-i18n="clearedToday">Cleared Today</div>
-            <div class="stat-value text-green" id="valClearedToday">0 / 50</div>
+            <div class="stat-value text-green" id="valClearedToday">-</div>
             <div class="stat-sublabel" data-i18n="tons">Tons</div>
           </div>
         </div>
@@ -462,15 +462,7 @@
 
   </main>
 
+  <!-- JS External File -->
   <script src="script.js"></script>
-
-  <!-- PWA Service Worker -->
-  <script>
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(err => console.log('SW registration failed:', err));
-      });
-    }
-  </script>
 </body>
 </html>
